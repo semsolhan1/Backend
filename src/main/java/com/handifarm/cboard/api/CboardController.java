@@ -12,6 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -36,6 +37,7 @@ public class CboardController {
     @PostMapping
     public ResponseEntity<?> createcboard(
         @Validated @RequestBody CboardCreateRequestDTO dto,
+        @RequestPart(value = "profileImage", required = false) MultipartFile profileImg,
             BindingResult result
     ){
             log.info("/api/cboard/post -{}",dto);
@@ -51,7 +53,14 @@ public class CboardController {
         }
 
         try {
-        CboardListResponseDTO cboardListResponseDTO = cboardService.create(dto);
+            String uploadedFilePath = null;
+
+            if(profileImg != null) {
+                log.info("attached file name: {}", profileImg.getOriginalFilename());
+                uploadedFilePath = cboardService.uploadProfileImage(profileImg);
+            }
+
+        CboardListResponseDTO cboardListResponseDTO = cboardService.create(dto,uploadedFilePath);
         return ResponseEntity.ok().body(cboardListResponseDTO);
         } catch (IllegalStateException e){
             log.warn(e.getMessage());
@@ -60,6 +69,9 @@ public class CboardController {
         catch (RuntimeException e){
             e.printStackTrace();
             return ResponseEntity.internalServerError().body("서버 오류 발생: " + e.getMessage());
+        } catch (Exception e){
+            log.warn(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -103,6 +115,7 @@ public class CboardController {
     @PutMapping
     public ResponseEntity<?> update(
             @Validated @RequestBody CboardModifyrequestDTO dto,
+            @RequestPart(value = "profileImage", required = false) MultipartFile profileImg,
             BindingResult result
     ){
 
@@ -113,7 +126,14 @@ public class CboardController {
         if(dto == null) return fielderrors;
 
         try {
-            CboardListResponseDTO cboardListResponseDTO = cboardService.update(dto);
+            String uploadedFilePath = null;
+
+            if(profileImg != null) {
+                log.info("attached file name: {}", profileImg.getOriginalFilename());
+                uploadedFilePath = cboardService.uploadProfileImage(profileImg);
+            }
+
+            CboardListResponseDTO cboardListResponseDTO = cboardService.update(dto,uploadedFilePath);
             return ResponseEntity.ok().body(cboardListResponseDTO);
         } catch ( Exception e ) {
             return ResponseEntity.badRequest().body(e.getMessage());

@@ -8,10 +8,15 @@ import com.handifarm.cboard.entity.Cboard;
 import com.handifarm.cboard.repository.CboardRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,6 +26,9 @@ import java.util.stream.Collectors;
 public class CboardService {
 
     private final CboardRepository cboardRepository;
+
+    @Value("${upload.path}")
+    private String uploadRootPath;
 
     public CboardListResponseDTO retrieve() {
 
@@ -35,11 +43,11 @@ public class CboardService {
 
     }
 
-    public CboardListResponseDTO create(CboardCreateRequestDTO dto)
+    public CboardListResponseDTO create(CboardCreateRequestDTO dto, final String uploadedFilePath)
             throws RuntimeException, IllegalStateException{
 
 
-        Cboard cboard = dto.toEntity();
+        Cboard cboard = dto.toEntity(uploadedFilePath);
 
         cboardRepository.save(cboard);
 
@@ -58,11 +66,19 @@ public class CboardService {
         return  retrieve();
     }
 
-    public CboardListResponseDTO update(CboardModifyrequestDTO dto) {
+    public CboardListResponseDTO update(CboardModifyrequestDTO dto, final String uploadedFilePath) {
 
         Cboard cboardEntity = getCboard(dto.getId());
 
+        if(!(dto.getTitle() == null)){
         cboardEntity.setTitle(dto.getTitle());
+        }
+        if(!(dto.getContent() == null)){
+        cboardEntity.setContent(dto.getContent());
+        }
+        if(!(dto.getFileUp() == null)){
+        cboardEntity.setFileUp(uploadedFilePath);
+        }
 
         cboardRepository.save(cboardEntity);
 
@@ -76,5 +92,22 @@ public class CboardService {
         Cboard cboardEntity = cboardRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException(id + "번 게시글은 존재하지 않습니다."));
         return cboardEntity;
+    }
+
+    public String uploadProfileImage(MultipartFile profileImg) throws IOException  {
+
+        File rootDirectory = new File(uploadRootPath);
+        if(!rootDirectory.exists()){
+            rootDirectory.mkdir();
+        }
+
+        String FileName = UUID.randomUUID()
+                + "_" + profileImg.getOriginalFilename();
+
+        File uploadFile = new File(uploadRootPath + "/" + FileName);
+        profileImg.transferTo(uploadFile);
+
+        return  FileName;
+
     }
 }

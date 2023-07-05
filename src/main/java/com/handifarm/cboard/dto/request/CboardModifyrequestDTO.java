@@ -16,5 +16,20 @@ public class CboardModifyrequestDTO {
     @NotBlank
     private String id;
 
+
     private String title;
+
+
+    private String content;
+
+
+    private String fileUp;
+
+//    public Cboard toModifyEntity(Cboard ModifyBoard,String uploadedFilePath){
+//        return Cboard.builder()
+//                .title(ModifyBoard.getTitle())
+//                .content(ModifyBoard.getContent())
+//                .fileUp(uploadedFilePath)
+//                .build();
+//    }
 }
