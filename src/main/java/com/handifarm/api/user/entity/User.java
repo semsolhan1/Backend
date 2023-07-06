@@ -39,11 +39,15 @@ public class User {
     @Column(nullable = false)
     private String addrDetail;
 //    @Column(nullable = false)
-//    private int addrZipNum;
+//    private int addrZipCode;
 
     private String userProfile;
 
     @CreationTimestamp
     private LocalDateTime joinDate;
+
+    public void addProfile(String userProfile) {
+        this.userProfile = userProfile;
+    }
 
 }

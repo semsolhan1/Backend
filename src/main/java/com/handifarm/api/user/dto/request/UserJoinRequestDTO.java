@@ -1,5 +1,6 @@
 package com.handifarm.api.user.dto.request;
 
+import com.handifarm.api.user.entity.User;
 import lombok.*;
 
 import javax.persistence.Id;
@@ -39,10 +40,22 @@ public class UserJoinRequestDTO {
     private String addrDetail;
 
 //    @NotBlank
-//    private String addrZipNum;
+//    private String addrZipCode;
 
     @NotBlank
-    @Size(min = 8, max = 12)
+    @Size(min = 8, max = 11)
     private String userPhoneNum;
+
+    public User dtoToEntity() {
+        return User.builder()
+                .userId(this.userId)
+                .userPw(this.userPw)
+                .userName(this.userName)
+                .userNick(this.userNick)
+                .userEmail(this.userEmail)
+                .addrBasic(this.addrBasic)
+                .addrDetail(this.addrDetail)
+                .build();
+    }
 
 }

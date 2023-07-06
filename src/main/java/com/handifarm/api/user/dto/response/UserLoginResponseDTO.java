@@ -1,6 +1,7 @@
 package com.handifarm.api.user.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.handifarm.api.user.entity.User;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -15,5 +16,12 @@ public class UserLoginResponseDTO {
     private String userName;
     private String userNick;
     private String token;
+
+    public UserLoginResponseDTO(User user, String token) {
+        this.userId = user.getUserId();
+        this.userName = user.getUserName();
+        this.userNick = user.getUserNick();
+        this.token = token;
+    }
 
 }
