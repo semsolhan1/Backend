@@ -29,21 +29,21 @@ public class User {
     private String userNick;
 
     @Column(nullable = false)
-    private String userPhone;
+    private String userPhoneNum;
 
     @Column(nullable = false)
-    private String userEmail1;
-    @Column(nullable = false)
-    private String userEmail2;
+    private String userEmail;
 
     @Column(nullable = false)
     private String addrBasic;
     @Column(nullable = false)
     private String addrDetail;
-    @Column(nullable = false)
-    private int addrZipNum;
+//    @Column(nullable = false)
+//    private int addrZipNum;
+
+    private String userProfile;
 
     @CreationTimestamp
-    private LocalDateTime regDate;
+    private LocalDateTime joinDate;
 
 }
