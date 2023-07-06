@@ -17,6 +17,9 @@ spring:
     multipart:
       max-file-size: 10MB # 1개의 파일의 최대 사이즈
       max-request-size: 20MB # 전체 요청의 최대 사이즈
+  config:
+    import:
+      - classpath:keys.yml
 
 logging.level:
   org.hibernate.SQL: debug
@@ -25,7 +28,3 @@ logging.level:
 spring-doc:
   swagger-ui:
     path: /myapi.html
-
-# 업로드 파일 저장 경로
-upload:
-  path: C:/handifarm_upload
