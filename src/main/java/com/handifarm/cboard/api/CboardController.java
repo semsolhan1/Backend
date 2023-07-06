@@ -1,5 +1,6 @@
 package com.handifarm.cboard.api;
 
+import com.handifarm.cboard.dto.page.PageDTO;
 import com.handifarm.cboard.dto.request.CboardCreateRequestDTO;
 import com.handifarm.cboard.dto.request.CboardModifyrequestDTO;
 import com.handifarm.cboard.dto.response.CboardListResponseDTO;
@@ -26,9 +27,9 @@ public class CboardController {
 
     //게시판 목록
     @GetMapping
-    public ResponseEntity<?> retrieveList(){
+    public ResponseEntity<?> retrieveList(PageDTO pageDTO){
 
-        CboardListResponseDTO dto = cboardService.retrieve();
+        CboardListResponseDTO dto = cboardService.retrieve(pageDTO);
 
         return ResponseEntity.ok().body(dto);
     }

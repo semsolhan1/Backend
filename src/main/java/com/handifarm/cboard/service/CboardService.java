@@ -1,14 +1,22 @@
 package com.handifarm.cboard.service;
 
+import com.handifarm.cboard.dto.page.PageDTO;
+import com.handifarm.cboard.dto.page.PageResponseDTO;
 import com.handifarm.cboard.dto.request.CboardCreateRequestDTO;
 import com.handifarm.cboard.dto.request.CboardModifyrequestDTO;
 import com.handifarm.cboard.dto.response.CboardDetailResponseDTO;
 import com.handifarm.cboard.dto.response.CboardListResponseDTO;
 import com.handifarm.cboard.entity.Cboard;
+import com.handifarm.cboard.entity.HashTag;
 import com.handifarm.cboard.repository.CboardRepository;
+import com.handifarm.cboard.repository.HashTagRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,21 +35,34 @@ public class CboardService {
 
     private final CboardRepository cboardRepository;
 
+    private final HashTagRepository hashTagRepository;
+
     @Value("${upload.path}")
     private String uploadRootPath;
 
-    public CboardListResponseDTO retrieve() {
+    public CboardListResponseDTO retrieve(PageDTO dto) {
 
-        List<Cboard> entityList = cboardRepository.findAll();
 
-        List<CboardDetailResponseDTO> dtoList = entityList.stream()
+        Pageable pageable = PageRequest.of(
+                dto.getPage()-1,
+                dto.getSize(),
+                Sort.by("boardTime").descending()
+        );
+
+        Page<Cboard> entityList = cboardRepository.findAll(pageable);
+
+        List<Cboard> cboardList = entityList.getContent();
+
+        List<CboardDetailResponseDTO> dtoList = cboardList.stream()
                 .map(board -> new CboardDetailResponseDTO(board))
                 .collect(Collectors.toList());
         return CboardListResponseDTO.builder()
+                .count(dtoList.size())
+                .pageInfo(new PageResponseDTO(entityList))
                 .board(dtoList)
                 .build();
-
     }
+
 
     public CboardListResponseDTO create(CboardCreateRequestDTO dto, final String uploadedFilePath)
             throws RuntimeException, IllegalStateException{
@@ -49,7 +70,27 @@ public class CboardService {
 
         Cboard cboard = dto.toEntity(uploadedFilePath);
 
-        cboardRepository.save(cboard);
+        List<String> hashTags = dto.getHashTags();
+
+        Cboard saved = cboardRepository.save(cboard);
+
+        if(hashTags != null && hashTags.size() > 0){
+            hashTags.forEach(hashtag -> {
+                HashTag savedTag = hashTagRepository.save(
+                    HashTag.builder()
+                            .hashName(hashtag)
+                            .cboard(saved)
+                            .build()
+
+                );
+
+                saved.addHashTag(savedTag);
+            });
+        }
+
+        Page<Cboard> entityList = saved.getCboardId();
+
+        List<Cboard> cboardList = entityList.getContent();
 
         return retrieve();
     }

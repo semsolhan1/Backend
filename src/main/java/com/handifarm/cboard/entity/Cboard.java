@@ -6,6 +6,8 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -36,5 +38,16 @@ public class Cboard {
     @CreationTimestamp
     private LocalDateTime boardTime;
 
+    @OneToMany(mappedBy = "cboard", orphanRemoval = true)
+    @Builder.Default
+    private List<HashTag> hashTags = new ArrayList<>();
 
+
+    public void addHashTag(HashTag savedTag) {
+        hashTags.add(savedTag);
+        if(this != savedTag.getCboard()){
+            savedTag.setCboard(this);
+        }
+
+    }
 }

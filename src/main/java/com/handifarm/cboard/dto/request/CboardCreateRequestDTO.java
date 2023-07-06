@@ -5,6 +5,7 @@ import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Getter
 @Setter
@@ -21,6 +22,8 @@ public class CboardCreateRequestDTO {
 
     @NotBlank
     private String content;
+
+    private List<String> hashTags;
 
     public Cboard toEntity(String uploadedFilePath){
         return Cboard.builder()

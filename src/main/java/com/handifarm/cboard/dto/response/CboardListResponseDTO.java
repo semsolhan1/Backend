@@ -1,5 +1,6 @@
 package com.handifarm.cboard.dto.response;
 
+import com.handifarm.cboard.dto.page.PageResponseDTO;
 import lombok.*;
 
 import java.util.List;
@@ -15,6 +16,10 @@ import java.util.List;
 public class CboardListResponseDTO {
 
     private String error;
+
+    private int count;
+
+    private PageResponseDTO pageInfo;
 
     private List<CboardDetailResponseDTO> board;
 
