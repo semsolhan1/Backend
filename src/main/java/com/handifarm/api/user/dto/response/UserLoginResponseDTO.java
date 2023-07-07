@@ -15,12 +15,14 @@ public class UserLoginResponseDTO {
     private String userId;
     private String userName;
     private String userNick;
+    private String userProfileImg;
     private String token;
 
     public UserLoginResponseDTO(User user, String token) {
         this.userId = user.getUserId();
         this.userName = user.getUserName();
         this.userNick = user.getUserNick();
+        this.userProfileImg = user.getUserProfileImg();
         this.token = token;
     }
 

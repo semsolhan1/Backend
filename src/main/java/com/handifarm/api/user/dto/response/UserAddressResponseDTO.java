@@ -10,6 +10,6 @@ public class UserAddressResponseDTO {
 
     private String addrBasic;
     private String addrDetail;
-//    private int addrZipCode;
+    private int addrZipCode;
 
 }
