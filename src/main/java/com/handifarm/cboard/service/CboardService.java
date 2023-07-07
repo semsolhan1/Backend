@@ -20,6 +20,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.webjars.NotFoundException;
 
 import java.io.File;
 import java.io.IOException;
@@ -88,23 +89,36 @@ public class CboardService {
             });
         }
 
-        Page<Cboard> entityList = saved.getCboardId();
+        PageDTO pageDTO = new PageDTO();
 
-        List<Cboard> cboardList = entityList.getContent();
-
-        return retrieve();
+        return retrieve(pageDTO);
     }
 
-    public CboardListResponseDTO delete(String cboardid) {
+    public CboardListResponseDTO delete(String cboardid) throws NotFoundException {
 
         try {
+            Cboard deletedCboard = cboardRepository.findById(cboardid)
+                    .orElseThrow(() -> new NotFoundException("해당 id에 해당하는 데이터를 찾을 수 없습니다. - id: " + cboardid));
             cboardRepository.deleteById(cboardid);
         } catch (Exception e){
             log.error("id가 없습니다. -id: {} , -err:{}" , cboardid, e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
 
-        return  retrieve();
+        // 삭제 이후 해당 페이지 조회
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("boardTime").descending()); // 예시로 페이지 1, 사이즈 10으로 설정
+        Page<Cboard> entityList = cboardRepository.findAll(pageable);
+
+        List<Cboard> cboardList = entityList.getContent();
+        List<CboardDetailResponseDTO> dtoList = cboardList.stream()
+                .map(board -> new CboardDetailResponseDTO(board))
+                .collect(Collectors.toList());
+
+        return CboardListResponseDTO.builder()
+                .count(dtoList.size())
+                .pageInfo(new PageResponseDTO(entityList))
+                .board(dtoList)
+                .build();
     }
 
     public CboardListResponseDTO update(CboardModifyrequestDTO dto, final String uploadedFilePath) {
@@ -121,9 +135,56 @@ public class CboardService {
         cboardEntity.setFileUp(uploadedFilePath);
         }
 
-        cboardRepository.save(cboardEntity);
+        Cboard saved = cboardRepository.save(cboardEntity);
 
-        return retrieve();
+//        if(dto.getHashTags() == null) {
+//
+//            // 기존의 해시태그 삭제
+//            List<HashTag> existingTags = hashTagRepository.findByCboard(cboardEntity);
+//            hashTagRepository.deleteAll(existingTags);
+//            cboardEntity.getHashTags().clear();
+//        }
+
+
+        if(!(dto.getHashTags() == null)){
+
+            // 기존의 해시태그 삭제
+            List<HashTag> existingTags = hashTagRepository.findByCboard(cboardEntity);
+            hashTagRepository.deleteAll(existingTags);
+            cboardEntity.getHashTags().clear();
+
+            List<String> hashTags = dto.getHashTags();
+
+            if(hashTags != null && !hashTags.isEmpty()){
+                for (String hashtag : hashTags) {
+                    HashTag savedTag = hashTagRepository.save(
+                            HashTag.builder()
+                                    .hashName(hashtag)
+                                    .cboard(saved)
+                                    .build()
+
+                    );
+
+                    saved.addHashTag(savedTag);
+                }
+            }
+
+        }
+
+        // 이전 페이지 조회
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("boardTime").descending()); // 예시로 페이지 1, 사이즈 10으로 설정
+        Page<Cboard> entityList = cboardRepository.findAll(pageable);
+
+        List<Cboard> cboardList = entityList.getContent();
+        List<CboardDetailResponseDTO> dtoList = cboardList.stream()
+                .map(board -> new CboardDetailResponseDTO(board))
+                .collect(Collectors.toList());
+
+        return CboardListResponseDTO.builder()
+                .count(dtoList.size())
+                .pageInfo(new PageResponseDTO(entityList))
+                .board(dtoList)
+                .build();
     }
 
     private Cboard getCboard(String id) {

@@ -3,6 +3,7 @@ package com.handifarm.cboard.dto.request;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 @Getter
 @Setter
@@ -22,6 +23,7 @@ public class CboardModifyrequestDTO {
 
     private String content;
 
+    private List<String> hashTags;
 
     private String fileUp;
 

@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@ToString(exclude = {""})
+@ToString(exclude = {"cboard"})
 @EqualsAndHashCode(of = "recontentId")
 @NoArgsConstructor
 @AllArgsConstructor
