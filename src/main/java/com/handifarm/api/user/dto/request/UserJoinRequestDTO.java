@@ -23,7 +23,7 @@ public class UserJoinRequestDTO {
     @Size(min = 8, max = 20)
     private String userPw;
 
-    @NotNull
+    @NotBlank
     private String userName;
 
     @Size(min = 2, max = 8)
@@ -34,17 +34,17 @@ public class UserJoinRequestDTO {
     private String userEmail;
 
     @NotBlank
+    @Size(min = 8, max = 11)
+    private String userPhoneNum;
+
+    @NotBlank
     private String addrBasic;
 
     @NotBlank
     private String addrDetail;
 
-//    @NotBlank
-//    private String addrZipCode;
-
-    @NotBlank
-    @Size(min = 8, max = 11)
-    private String userPhoneNum;
+    @NotNull
+    private int addrZipCode;
 
     public User dtoToEntity() {
         return User.builder()
@@ -53,8 +53,10 @@ public class UserJoinRequestDTO {
                 .userName(this.userName)
                 .userNick(this.userNick)
                 .userEmail(this.userEmail)
+                .userPhoneNum(this.userPhoneNum)
                 .addrBasic(this.addrBasic)
                 .addrDetail(this.addrDetail)
+                .addrZipCode(this.addrZipCode)
                 .build();
     }
 

@@ -19,9 +19,6 @@ public interface IUserService {
     UserLoginResponseDTO authenticate(final UserLoginRequestDTO dto);
 
     // 프로필 이미지 등록
-    void uploadUserProfile(TokenUserInfo userInfo, MultipartFile profileImg) throws Exception;
-
-    // 프로필 이미지 링크 리턴
-    String getUserProfile(final String userId);
+    String uploadUserProfileImg(TokenUserInfo userInfo, MultipartFile profileImg) throws Exception;
 
 }

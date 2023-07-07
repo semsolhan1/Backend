@@ -38,16 +38,12 @@ public class User {
     private String addrBasic;
     @Column(nullable = false)
     private String addrDetail;
-//    @Column(nullable = false)
-//    private int addrZipCode;
+    @Column(nullable = false)
+    private int addrZipCode;
 
-    private String userProfile;
+    private String userProfileImg;
 
     @CreationTimestamp
     private LocalDateTime joinDate;
-
-    public void addProfile(String userProfile) {
-        this.userProfile = userProfile;
-    }
 
 }
