@@ -58,15 +58,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         null// 회원 권한 기능 추가 시 주석 해제 후 설정
 //                        ,authorityList // 인가 정보 (권한 정보)
                 );
-                log.info("통과1");
 
                 // 인증 완료 처리시 클라이언트의 요청 정보 세팅
                 auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                log.info("통과2");
 
                 // 스프링 시큐리티 컨테이너에 인증 정보 객체 등록
                 SecurityContextHolder.getContext().setAuthentication(auth);
-                log.info("통과3");
 
             }
         } catch (Exception e) {
