@@ -20,6 +20,7 @@ import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
+@CrossOrigin
 public class UserController {
 
     private final UserService service;
