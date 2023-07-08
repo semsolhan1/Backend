@@ -14,6 +14,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Map;
+
 @RestController
 @Slf4j
 @RequiredArgsConstructor
@@ -32,6 +34,24 @@ public class UserController {
         log.info("ID : {}, 중복 여부 : {}", userId, check);
 
         return ResponseEntity.ok().body(check);
+    }
+
+    // 휴대폰 인증번호 요청
+    @PostMapping("/phoneNumAuthenticate")
+    public ResponseEntity<?> sendAuthenticationNumber(@RequestBody Map<String, String> inputPhoneNum) {
+
+        log.info("컨트롤러에서 넘겨받은 변수 : {}", inputPhoneNum);
+
+        String sendTo = inputPhoneNum.get("sendTo");
+
+        if (sendTo == null || sendTo.trim().equals("")) {
+            return ResponseEntity.badRequest().body("휴대폰 번호가 넘어오지 않음.");
+        }
+
+        int authenticationNumber = service.sendMessage(sendTo);
+        log.info("{} 번호의 인증번호 : {}", sendTo, authenticationNumber);
+
+        return ResponseEntity.ok().body(authenticationNumber);
     }
 
     // 가입 요청 처리

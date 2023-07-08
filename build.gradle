@@ -53,6 +53,9 @@ dependencies {
 	// S3 라이브러리
 	implementation 'software.amazon.awssdk:s3:2.17.52'
 
+	// 문자 전송 API (coolsms)
+	implementation 'net.nurigo:sdk:4.2.7'
+
 }
 
 tasks.named('test') {
