@@ -12,10 +12,10 @@ public interface IUserService {
     boolean idDuplicateCheck(final String userId);
 
     // 휴대폰 인증번호 발송 및 프론트로 리턴
-    int sendMessage(final String phoneNum);
+    String sendMessage(final String phoneNum);
 
     // 회원가입 처리
-    void join(final UserJoinRequestDTO dto) throws Exception;
+    void join(final UserJoinRequestDTO dto);
 
     // 로그인 처리 및 토큰 발급
     UserLoginResponseDTO authenticate(final UserLoginRequestDTO dto);

@@ -48,15 +48,17 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public int sendMessage(String phoneNum) {
+    public String sendMessage(String phoneNum) {
         log.info("서비스에서 넘겨받은 변수 : {}", phoneNum);
-        Message message = new Message();
 
+        // 인증번호 생성
+        String authenticationNumber = makeAuthenticationNumber();
+
+        // 메시지 전송 시작.
+        Message message = new Message();
         final DefaultMessageService messageService
                 = NurigoApp.INSTANCE.initialize(apiKey, secretKey, "https://api.coolsms.co.kr");
 
-        // 인증번호 생성
-        int authenticationNumber = makeAuthenticationNumber();
         // 전송할 메시지 정보 설정
         message.setFrom(sendNumber); // 발신번호
         message.setTo(phoneNum); // 수신번호
@@ -64,20 +66,21 @@ public class UserService implements IUserService {
 
         SingleMessageSentResponse sentResponse = messageService.sendOne(new SingleMessageSendingRequest(message));
         log.info("전송한 메세지 정보 : {}", sentResponse);
+        // 메시지 전송 끝.
 
         return authenticationNumber;
     }
 
     // 인증번호 생성 메서드(난수)
-    private int makeAuthenticationNumber() {
+    private String makeAuthenticationNumber() {
         Random r = new Random();
         int checkNum = r.nextInt(8999) + 1000;
         log.info("인증 번호 : " + checkNum);
-        return checkNum;
+        return String.valueOf(checkNum);
     }
 
     @Override
-    public void join(final UserJoinRequestDTO dto) throws Exception {
+    public void join(final UserJoinRequestDTO dto) {
 
         if (dto == null) {
             throw new RuntimeException("가입 정보가 없습니다.");
