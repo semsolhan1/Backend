@@ -12,6 +12,6 @@ public class BoardListResponseDTO {
 
   private int count;
   private PageResponseDTO pageInfo;
-  private List<BoardDetailResonseDTO> boards;
+  private List<BoardDetailResponseDTO> boards;
 
 }

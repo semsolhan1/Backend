@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @ToString @EqualsAndHashCode
 @AllArgsConstructor @NoArgsConstructor
 @Builder
-public class BoardDetailResonseDTO {
+public class BoardDetailResponseDTO {
 
   private String author;
 
@@ -22,7 +22,7 @@ public class BoardDetailResonseDTO {
 
   private String category;
 
-  public BoardDetailResonseDTO(Board board) {
+  public BoardDetailResponseDTO(Board board) {
     this.author = board.getUserId();
     this.title = board.getTitle();
     this.content = board.getContent();

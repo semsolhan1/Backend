@@ -3,6 +3,7 @@ package com.handifarm.api.board.Service;
 
 import com.handifarm.api.board.dto.*;
 import com.handifarm.api.board.entity.Board;
+import com.handifarm.api.board.entity.Category;
 import com.handifarm.api.board.repository.BoardRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -42,9 +43,9 @@ public class BoardService {
     // 게시물 정보만 꺼내기
     List<Board> boardList = boards.getContent();
 
-    List<BoardDetailResonseDTO> detailList
+    List<BoardDetailResponseDTO> detailList
             = boardList.stream()
-            .map(board -> new BoardDetailResonseDTO(board))
+            .map(board -> new BoardDetailResponseDTO(board))
               .collect(Collectors.toList());
 
     //DB에서 조회한 정보(ENTITY)를 JSON 형태에 맞는 DTO로 변환
@@ -55,11 +56,11 @@ public class BoardService {
             .build();
   }
 
-  public BoardDetailResonseDTO getDetail(long board_no) {
+  public BoardDetailResponseDTO getDetail(long board_no) {
 
     Board boardEntity = getBoard(board_no);
 
-    return new BoardDetailResonseDTO(boardEntity);
+    return new BoardDetailResponseDTO(boardEntity);
 
   }
 
@@ -70,15 +71,15 @@ public class BoardService {
             );
     return boardEntity;
   }
- public BoardDetailResonseDTO insert(final BoardCreateDTO dto)
+ public BoardDetailResponseDTO insert(final BoardCreateDTO dto)
    throws RuntimeException {
    Board saved = boardRepository.save(dto.toEntity());
 
- return new BoardDetailResonseDTO(saved);
+ return new BoardDetailResponseDTO(saved);
  }
 
  // 게시물 저장
-  public BoardDetailResonseDTO modify(boardModifyDTO dto) {
+  public BoardDetailResponseDTO modify(boardModifyDTO dto) {
 
     // 수정 전 데이터를 조회
     Board boardEntity = getBoard(dto.getBoardNo());
@@ -90,11 +91,19 @@ public class BoardService {
     //수정 완료
     Board modifiedBoard = boardRepository.save(boardEntity);
 
-    return new BoardDetailResonseDTO(modifiedBoard);
+    return new BoardDetailResponseDTO(modifiedBoard);
   }
 
 
   public void delete(long boardNo) {
      boardRepository.deleteById(boardNo);
+  }
+
+  public BoardService(BoardRepository boardRepository) {
+    this.boardRepository = boardRepository;
+  }
+
+  public List<Board> searchByCategory(Category category) {
+    return boardRepository.findByCategory(category);
   }
 }

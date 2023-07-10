@@ -2,6 +2,8 @@ package com.handifarm.api.board.controller;
 
 import com.handifarm.api.board.Service.BoardService;
 import com.handifarm.api.board.dto.*;
+import com.handifarm.api.board.entity.Board;
+import com.handifarm.api.board.entity.Category;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -14,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 
 @Tag(name = "board API", description = "게시물 조회, 등록 및 수정, 삭제 api")
@@ -23,7 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/api/ex/boards")
 public class BoardApiController {
 
-  private final BoardService boardService;
+  private BoardService boardService;
 
   // 게시글 목록 조회
   @GetMapping
@@ -41,7 +44,7 @@ public class BoardApiController {
     log.info("/api/ex/board/{}: GET", board_no);
 
     try {
-      BoardDetailResonseDTO dto = boardService.getDetail(board_no);
+      BoardDetailResponseDTO dto = boardService.getDetail(board_no);
       return ResponseEntity.ok().body(dto);
     } catch (Exception e) {
       return ResponseEntity.badRequest().body(e.getMessage());
@@ -73,7 +76,7 @@ public class BoardApiController {
     }
 
   try {
-    BoardDetailResonseDTO responseDTO = boardService.insert(dto);
+    BoardDetailResponseDTO responseDTO = boardService.insert(dto);
     return ResponseEntity.ok()
             .body(responseDTO);
   } catch (RuntimeException e) {
@@ -94,12 +97,12 @@ public ResponseEntity<?> update(
     log.info("/api/ex/boars {} - dto: {}"
             , request.getMethod(), dto);
 
-    BoardDetailResonseDTO resonseDTO = boardService.modify(dto);
+    BoardDetailResponseDTO resonseDTO = boardService.modify(dto);
 
             return ResponseEntity.ok().body(resonseDTO);
 }
 //게시물 삭제
-@DeleteMapping("/{board_no")
+@DeleteMapping("/{board_no}")
   public ResponseEntity<?> delete(@PathVariable long board_no) {
     log.info("/api/ex/boards/{} DELETE!", board_no);
 
@@ -116,4 +119,12 @@ public ResponseEntity<?> update(
 
 }
 
+public void BoardController(BoardService boardService) {
+    this.boardService = boardService;
+}
+
+@GetMapping("/search")
+  public List<Board> searchBoards(@RequestParam Category category) {
+    return boardService.searchByCategory(category);
+}
 }
