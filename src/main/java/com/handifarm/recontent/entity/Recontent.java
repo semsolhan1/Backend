@@ -29,7 +29,6 @@ public class Recontent {
     @Column(nullable = false)
     private String recontent;
 
-
     private String rewriter;
 
     @CreationTimestamp

@@ -41,6 +41,7 @@ public class CboardService {
     @Value("${upload.path}")
     private String uploadRootPath;
 
+
     public CboardListResponseDTO retrieve(PageDTO dto) {
 
 
@@ -96,28 +97,29 @@ public class CboardService {
 
     public CboardListResponseDTO delete(String cboardid) throws NotFoundException {
 
-        try {
-            Cboard deletedCboard = cboardRepository.findById(cboardid)
-                    .orElseThrow(() -> new NotFoundException("해당 id에 해당하는 데이터를 찾을 수 없습니다. - id: " + cboardid));
-            cboardRepository.deleteById(cboardid);
-        } catch (Exception e){
-            log.error("id가 없습니다. -id: {} , -err:{}" , cboardid, e.getMessage());
-            throw new RuntimeException(e.getMessage());
-        }
+        Cboard deletedCboard = cboardRepository.findById(cboardid)
+                .orElseThrow(() -> new NotFoundException("해당 id에 해당하는 데이터를 찾을 수 없습니다. - id: " + cboardid));
+        cboardRepository.deleteById(cboardid);
 
-        // 삭제 이후 해당 페이지 조회
-        Pageable pageable = PageRequest.of(0, 10, Sort.by("boardTime").descending()); // 예시로 페이지 1, 사이즈 10으로 설정
-        Page<Cboard> entityList = cboardRepository.findAll(pageable);
+        // 삭제된 게시물의 이전 게시물 조회
+        Cboard previousCboard = cboardRepository.findFirstByBoardTimeLessThanOrderByBoardTimeDesc(deletedCboard.getBoardTime());
 
-        List<Cboard> cboardList = entityList.getContent();
+
+        // 현재 페이지 조회
+        int pageSize = 10; // 페이지 사이즈
+        Pageable pageable = PageRequest.of(0, pageSize, Sort.by("boardTime").descending()); // 예시로 첫 번째 페이지 조회
+        Page<Cboard> pageData = cboardRepository.findAll(pageable);
+
+        List<Cboard> cboardList = pageData.getContent();
         List<CboardDetailResponseDTO> dtoList = cboardList.stream()
                 .map(board -> new CboardDetailResponseDTO(board))
                 .collect(Collectors.toList());
 
         return CboardListResponseDTO.builder()
                 .count(dtoList.size())
-                .pageInfo(new PageResponseDTO(entityList))
+                .pageInfo(new PageResponseDTO(pageData))
                 .board(dtoList)
+                .previousCboard(previousCboard != null ? new CboardDetailResponseDTO(previousCboard) : null)
                 .build();
     }
 
@@ -136,14 +138,6 @@ public class CboardService {
         }
 
         Cboard saved = cboardRepository.save(cboardEntity);
-
-//        if(dto.getHashTags() == null) {
-//
-//            // 기존의 해시태그 삭제
-//            List<HashTag> existingTags = hashTagRepository.findByCboard(cboardEntity);
-//            hashTagRepository.deleteAll(existingTags);
-//            cboardEntity.getHashTags().clear();
-//        }
 
 
         if(!(dto.getHashTags() == null)){
@@ -196,6 +190,8 @@ public class CboardService {
         return cboardEntity;
     }
 
+
+
     public String uploadProfileImage(MultipartFile profileImg) throws IOException  {
 
         File rootDirectory = new File(uploadRootPath);
@@ -212,4 +208,5 @@ public class CboardService {
         return  FileName;
 
     }
+
 }

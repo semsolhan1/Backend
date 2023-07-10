@@ -14,6 +14,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.webjars.NotFoundException;
 
 import java.util.List;
 
@@ -33,6 +34,7 @@ public class CboardController {
 
         return ResponseEntity.ok().body(dto);
     }
+
 
     //게시판 등록 요청
     @PostMapping
@@ -94,23 +96,21 @@ public class CboardController {
     //게시판 삭제 요청
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletecboard(
+    public ResponseEntity<?> deleteCboard(
             @PathVariable("id") String cboardid
-            ){
-
+    ) {
         log.info("/api/cboard/{} DELETE request", cboardid);
 
-        if(cboardid == null || cboardid.trim().equals("")){
+        if (cboardid == null || cboardid.trim().equals("")) {
             return ResponseEntity.badRequest().body(CboardListResponseDTO.builder().error("id를 전달해 주세요."));
         }
 
         try {
             CboardListResponseDTO cboardListResponseDTO = cboardService.delete(cboardid);
             return ResponseEntity.ok().body(cboardListResponseDTO);
-        } catch (Exception e){
+        } catch (NotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-
     }
 
     @PutMapping

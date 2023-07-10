@@ -1,5 +1,6 @@
 package com.handifarm.cboard.entity;
 
+import com.handifarm.recontent.entity.Recontent;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
@@ -42,12 +43,17 @@ public class Cboard {
     @Builder.Default
     private List<HashTag> hashTags = new ArrayList<>();
 
+    @OneToMany(mappedBy = "cboard", orphanRemoval = true)
+    @Builder.Default
+    private List<Recontent> recontents = new ArrayList<>();
+
 
     public void addHashTag(HashTag savedTag) {
         hashTags.add(savedTag);
         if(this != savedTag.getCboard()){
             savedTag.setCboard(this);
         }
-
     }
+
+
 }

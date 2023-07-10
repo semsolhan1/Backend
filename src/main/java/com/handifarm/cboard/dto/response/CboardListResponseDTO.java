@@ -23,4 +23,6 @@ public class CboardListResponseDTO {
 
     private List<CboardDetailResponseDTO> board;
 
+    private CboardDetailResponseDTO previousCboard;
+
 }
