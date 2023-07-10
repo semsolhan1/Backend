@@ -50,13 +50,15 @@ public class UserService implements IUserService {
     @Override
     public String sendMessage(String phoneNum) {
         log.info("서비스에서 넘겨받은 변수 : {}", phoneNum);
-        Message message = new Message();
-
-        final DefaultMessageService messageService
-                = NurigoApp.INSTANCE.initialize(apiKey, secretKey, "https://api.coolsms.co.kr");
 
         // 인증번호 생성
         String authenticationNumber = makeAuthenticationNumber();
+
+        // 메시지 전송 시작.
+        Message message = new Message();
+        final DefaultMessageService messageService
+                = NurigoApp.INSTANCE.initialize(apiKey, secretKey, "https://api.coolsms.co.kr");
+
         // 전송할 메시지 정보 설정
         message.setFrom(sendNumber); // 발신번호
         message.setTo(phoneNum); // 수신번호
@@ -64,6 +66,7 @@ public class UserService implements IUserService {
 
         SingleMessageSentResponse sentResponse = messageService.sendOne(new SingleMessageSendingRequest(message));
         log.info("전송한 메세지 정보 : {}", sentResponse);
+        // 메시지 전송 끝.
 
         return authenticationNumber;
     }
