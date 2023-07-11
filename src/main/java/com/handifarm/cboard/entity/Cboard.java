@@ -36,6 +36,7 @@ public class Cboard {
 
     private String writer;
 
+
     @CreationTimestamp
     private LocalDateTime boardTime;
 

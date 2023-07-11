@@ -22,6 +22,7 @@ public class CboardDetailResponseDTO {
     private String fileUp;
     private List<String> hashTags;
 
+
     public CboardDetailResponseDTO(Cboard cboard){
         this.id = cboard.getCboardId();
         this.title = cboard.getTitle();

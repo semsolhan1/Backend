@@ -97,16 +97,21 @@ public class CboardController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteCboard(
-            @PathVariable("id") String cboardid
+            @PathVariable("id") String cboardid,
+            @RequestParam(required = false) Integer page
     ) {
-        log.info("/api/cboard/{} DELETE request", cboardid);
+        log.info("/api/cboard/{} DELETE request", cboardid,page);
 
         if (cboardid == null || cboardid.trim().equals("")) {
             return ResponseEntity.badRequest().body(CboardListResponseDTO.builder().error("id를 전달해 주세요."));
         }
 
+        // currentPage가 null일 경우 기본값으로 1을 사용하도록 처리
+        int pageNumber = page != null ? page : 1;
+
+
         try {
-            CboardListResponseDTO cboardListResponseDTO = cboardService.delete(cboardid);
+            CboardListResponseDTO cboardListResponseDTO = cboardService.delete(cboardid,pageNumber);
             return ResponseEntity.ok().body(cboardListResponseDTO);
         } catch (NotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -116,6 +121,7 @@ public class CboardController {
     @PutMapping
     public ResponseEntity<?> update(
             @Validated @RequestBody CboardModifyrequestDTO dto,
+            @RequestParam(required = false) Integer page,
             @RequestPart(value = "profileImage", required = false) MultipartFile profileImg,
             BindingResult result
     ){
@@ -134,7 +140,7 @@ public class CboardController {
                 uploadedFilePath = cboardService.uploadProfileImage(profileImg);
             }
 
-            CboardListResponseDTO cboardListResponseDTO = cboardService.update(dto,uploadedFilePath);
+            CboardListResponseDTO cboardListResponseDTO = cboardService.update(dto,page,uploadedFilePath);
             return ResponseEntity.ok().body(cboardListResponseDTO);
         } catch ( Exception e ) {
             return ResponseEntity.badRequest().body(e.getMessage());

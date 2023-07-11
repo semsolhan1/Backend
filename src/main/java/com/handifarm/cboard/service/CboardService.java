@@ -95,7 +95,7 @@ public class CboardService {
         return retrieve(pageDTO);
     }
 
-    public CboardListResponseDTO delete(String cboardid) throws NotFoundException {
+    public CboardListResponseDTO delete(String cboardid, int currentPage) throws NotFoundException {
 
         Cboard deletedCboard = cboardRepository.findById(cboardid)
                 .orElseThrow(() -> new NotFoundException("해당 id에 해당하는 데이터를 찾을 수 없습니다. - id: " + cboardid));
@@ -103,11 +103,13 @@ public class CboardService {
 
         // 삭제된 게시물의 이전 게시물 조회
         Cboard previousCboard = cboardRepository.findFirstByBoardTimeLessThanOrderByBoardTimeDesc(deletedCboard.getBoardTime());
+        // 삭제된 게시물의 다음 게시물 조회
+        Cboard nextCboard = cboardRepository.findFirstByBoardTimeGreaterThanOrderByBoardTimeAsc(deletedCboard.getBoardTime());
 
 
         // 현재 페이지 조회
         int pageSize = 10; // 페이지 사이즈
-        Pageable pageable = PageRequest.of(0, pageSize, Sort.by("boardTime").descending()); // 예시로 첫 번째 페이지 조회
+        Pageable pageable = PageRequest.of(currentPage - 1, pageSize, Sort.by("boardTime").descending()); // 예시로 첫 번째 페이지 조회
         Page<Cboard> pageData = cboardRepository.findAll(pageable);
 
         List<Cboard> cboardList = pageData.getContent();
@@ -115,15 +117,53 @@ public class CboardService {
                 .map(board -> new CboardDetailResponseDTO(board))
                 .collect(Collectors.toList());
 
+        // 페이지 정보 동적 갱신
+        PageResponseDTO pageResponseDTO = new PageResponseDTO(pageData);
+        pageResponseDTO.setCurrentPage(currentPage); // 현재 페이지 번호 갱신
+
+        // board가 빈 값인 경우
+        if (cboardList.isEmpty() && currentPage > 1) {
+            // 이전 페이지로 이동
+            currentPage--;
+            pageable = PageRequest.of(currentPage - 1, pageSize, Sort.by("boardTime").descending());
+            pageData = cboardRepository.findAll(pageable);
+            cboardList = pageData.getContent();
+            dtoList = cboardList.stream()
+                    .map(board -> new CboardDetailResponseDTO(board))
+                    .collect(Collectors.toList());
+            pageResponseDTO = new PageResponseDTO(pageData);
+            pageResponseDTO.setCurrentPage(currentPage);
+
+            // board가 다시 비어 있는 경우
+            if (cboardList.isEmpty()) {
+                // 첫 페이지로 이동
+                currentPage = 1;
+                pageable = PageRequest.of(0, pageSize, Sort.by("boardTime").descending());
+                pageData = cboardRepository.findAll(pageable);
+                cboardList = pageData.getContent();
+                dtoList = cboardList.stream()
+                        .map(board -> new CboardDetailResponseDTO(board))
+                        .collect(Collectors.toList());
+                pageResponseDTO = new PageResponseDTO(pageData);
+                pageResponseDTO.setCurrentPage(currentPage);
+            }
+        }
+
+        CboardDetailResponseDTO previousOrNextCboard = null;
+        if (previousCboard != null) {
+            previousOrNextCboard = new CboardDetailResponseDTO(previousCboard);
+        } else if (nextCboard != null) {
+            previousOrNextCboard = new CboardDetailResponseDTO(nextCboard);
+        }
         return CboardListResponseDTO.builder()
                 .count(dtoList.size())
-                .pageInfo(new PageResponseDTO(pageData))
+                .pageInfo(pageResponseDTO)
                 .board(dtoList)
-                .previousCboard(previousCboard != null ? new CboardDetailResponseDTO(previousCboard) : null)
+                .previousCboard(previousOrNextCboard)
                 .build();
     }
 
-    public CboardListResponseDTO update(CboardModifyrequestDTO dto, final String uploadedFilePath) {
+    public CboardListResponseDTO update(CboardModifyrequestDTO dto, int page ,final String uploadedFilePath) {
 
         Cboard cboardEntity = getCboard(dto.getId());
 
@@ -165,19 +205,29 @@ public class CboardService {
 
         }
 
-        // 이전 페이지 조회
-        Pageable pageable = PageRequest.of(0, 10, Sort.by("boardTime").descending()); // 예시로 페이지 1, 사이즈 10으로 설정
-        Page<Cboard> entityList = cboardRepository.findAll(pageable);
+        Cboard modifiedCboard = cboardRepository.findByCboardId(dto.getId());
 
-        List<Cboard> cboardList = entityList.getContent();
+        CboardDetailResponseDTO modified = new CboardDetailResponseDTO(modifiedCboard);
+
+        // 이전 페이지 조회
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("boardTime").descending());
+        Page<Cboard> pageData = cboardRepository.findAll(pageable);
+
+
+        List<Cboard> cboardList = pageData.getContent();
         List<CboardDetailResponseDTO> dtoList = cboardList.stream()
                 .map(board -> new CboardDetailResponseDTO(board))
                 .collect(Collectors.toList());
 
+        // 페이지 정보 동적 갱신
+        PageResponseDTO pageResponseDTO = new PageResponseDTO(pageData);
+        pageResponseDTO.setCurrentPage(page); // 현재 페이지 번호 갱신
+
         return CboardListResponseDTO.builder()
                 .count(dtoList.size())
-                .pageInfo(new PageResponseDTO(entityList))
+                .pageInfo(pageResponseDTO)
                 .board(dtoList)
+                .previousCboard(modified)
                 .build();
     }
 

@@ -12,4 +12,9 @@ public interface CboardRepository extends JpaRepository<Cboard,String>{
     Cboard findFirstByBoardTimeLessThanOrderByBoardTimeDesc(LocalDateTime boardTime);
 
 
+//    Cboard findFirstByBoardTimeGreaterThanOrderByBoardTimeDesc(LocalDateTime boardTime);
+
+    Cboard findFirstByBoardTimeGreaterThanOrderByBoardTimeAsc(LocalDateTime boardTime);
+
+    Cboard findByCboardId(String id);
 }
