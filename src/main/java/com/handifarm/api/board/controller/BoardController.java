@@ -1,9 +1,13 @@
 package com.handifarm.api.board.controller;
 
+import com.handifarm.api.board.dto.request.BoardModifyRequestDTO;
+import com.handifarm.api.board.dto.request.BoardWriteRequestDTO;
 import com.handifarm.api.board.dto.response.BoardListResponseDTO;
 import com.handifarm.api.board.service.BoardService;
+import com.handifarm.jwt.TokenUserInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,77 +19,36 @@ public class BoardController {
 
     private final BoardService boardService;
 
-    //게시판 목록 요청
-    public ResponseEntity<?> retrieveBoardList() {
-        log.info("/api/board GET request");
-        BoardListResponseDTO responseDTO = boardService.retrieve();
-
-        return ResponseEntity.ok().body(responseDTO);
+    // 특정 사용자 게시글 목록 조회
+    @GetMapping("/{userId}")
+    public ResponseEntity<?> retrieveBoard(@PathVariable String userId) {
+        BoardListResponseDTO boardList = boardService.retrieve(userId);
+        return ResponseEntity.ok(boardList);
     }
 
-    //게시판 등록 요청
-    public ResponseEntity<?> createBoard(
-            @Validated @RequestBody BoardCreateRequestDTO requestDTO,
-            bindingResult result
-    ) {
-        if (result.hasErrors()) {
-            log.warn("DTO 검증 에러 발생");
-            return ResponseEntity.badRequest().body(result.getFieldError());
-        }
-        try {
-            BoardListResponseDTO responseDTO = boardService.create(requestDTO);
-            return ResponseEntity.ok().body(responseDTO);
-        } catch (RuntimeException e) {
-            log.error(e.getMessage());
-            return ResponseEntity.internalServerError()
-                    .body(BoardListResponseDTO.builder().error(e.getMessage()));
-        }
-
+    // 게시글 등록
+    @PostMapping
+    public ResponseEntity<?> registBoard(@RequestBody BoardWriteRequestDTO requestDTO, TokenUserInfo userInfo) {
+        boardService.registBoard(requestDTO, userInfo);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    // 게시글 수정
+    @PutMapping("/{boardNo}")
+    public ResponseEntity<?> updateBoard(@PathVariable long boardNo, @RequestBody BoardModifyRequestDTO requestDTO) {
+        requestDTO.setBoardNo(boardNo);
+        boardService.updateBoard(requestDTO);
+        return ResponseEntity.ok().build();
+    }
 
-    //게시판 삭제 요청
+    // 게시글 삭제
     @DeleteMapping("/{boardNo}")
-    public ResponseEntity<?> deleteBoard(
-            @PathVariable("boardNo") String boardNo
-    ) {
-        log.info("/api/board/{} DELETE 리퀘스트", boardNo);
-        if(boardNo == null || boardNo.trim().equals("")) {
-            return ResponseEntity.badRequest()
-                    .body(BoardListResponseDTO.builder().error("ID를 전달해주세요"));
-        }
-
-        try {
-            BoardListResponseDTO responseDTO = todoService.delete(boardNo);
-            return ResponseEntity.ok().body(responseDTO);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError()
-                    .body(BoardListResponseDTO.builder().error(e.getMessage()));
-        }
-
+    public ResponseEntity<?> deleteBoard(@PathVariable long boardNo) {
+        boardService.deleteBoard(boardNo);
+        return ResponseEntity.ok().build();
     }
 
 
-    //게시판 수정 요청
-    @RequestMapping(method = {RequestMethod.PUT, RequestMethod.PATCH})
-    public ResponseEntity<?> updateBoard(
-            @Validated @RequestBody BoardModifyRequestDTO requestDTO, BindingResult result, HttpServletRequest request)
-    {
-        if(result.hasErrors()) {
-            return ResponseEntity.badRequest().body(result.getFieldError());
-        }
-
-        log.info("/api/board {} request!", request.getMethod());
-        log.info("modifying dto: {}", requestDTO.toString());
-
-        try {
-            BoardListResponseDTO responseDTO = boardService.update(requestDTO);
-            return ResponseEntity.ok().body(responseDTO);
-        } catch (RuntimeException e) {
-            return ResponseEntity.internalServerError()
-                    .body(BoardListResponseDTO.builder().error(e.getMessage()));
-        }
-    }
 
 
 

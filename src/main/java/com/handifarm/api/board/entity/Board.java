@@ -15,14 +15,9 @@ import java.time.LocalDateTime;
 public class Board {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long boardNo;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @Column(nullable = false)
-    @JoinColumn(name = "user_id")
-    private User writer;
-
-    @Enumerated
     @Column(nullable = false)
     private String category;
 
@@ -41,5 +36,8 @@ public class Board {
     @UpdateTimestamp
     private LocalDateTime updateDate;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
 }

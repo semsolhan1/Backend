@@ -2,18 +2,17 @@ package com.handifarm.api.board.dto.response;
 
 import lombok.*;
 
-@Setter @Getter @ToString
+import java.util.List;
+
+@Getter @Setter @ToString
 @EqualsAndHashCode @NoArgsConstructor @AllArgsConstructor
 @Builder
 public class BoardListResponseDTO {
 
-
-    private String error;
+    private List<BoardDetailResponseDTO> postList;
 
     private int postCount;
 
-    private List<BoardResponseDetailDTO> postList;
-
     private BoardPageResponseDTO pageInfo;
-}
+
 }

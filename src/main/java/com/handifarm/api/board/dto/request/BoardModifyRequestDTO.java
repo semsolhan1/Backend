@@ -5,13 +5,13 @@ import lombok.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-@Setter @Getter @ToString
-@EqualsAndHashCode @NoArgsConstructor @AllArgsConstructor
+@Getter @Setter @ToString
+@EqualsAndHashCode
+@NoArgsConstructor @AllArgsConstructor
 @Builder
 public class BoardModifyRequestDTO {
 
-
-    private long boardNo;
+    private Long boardNo;
 
     @NotNull
     @Size(min=8, max=20)
