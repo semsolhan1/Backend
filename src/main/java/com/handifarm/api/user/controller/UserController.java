@@ -49,7 +49,7 @@ public class UserController {
             return ResponseEntity.badRequest().body("휴대폰 번호가 넘어오지 않음.");
         }
 
-        String  authenticationNumber = service.sendMessage(sendTo);
+        String authenticationNumber = service.sendMessage(sendTo);
         log.info("{} 번호의 인증번호 : {}", sendTo, authenticationNumber);
 
         return ResponseEntity.ok().body(authenticationNumber);
