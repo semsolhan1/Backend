@@ -25,10 +25,10 @@ public class Recontent {
     @GenericGenerator(name = "recontent_uuid", strategy = "uuid")
     private String recontentId;
 
-
     @Column(nullable = false)
     private String recontent;
 
+    @Column(nullable = false)
     private String rewriter;
 
     @CreationTimestamp

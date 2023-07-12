@@ -32,9 +32,11 @@ public class Cboard {
     @Column(nullable = false)
     private String content;
 
+    @Column(nullable = false)
+    private String writer;
+
     private String fileUp;
 
-    private String writer;
 
 
     @CreationTimestamp

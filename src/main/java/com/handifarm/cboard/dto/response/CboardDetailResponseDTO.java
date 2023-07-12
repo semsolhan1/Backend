@@ -4,6 +4,7 @@ import com.handifarm.cboard.entity.Cboard;
 import com.handifarm.cboard.entity.HashTag;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,17 +18,20 @@ import java.util.stream.Collectors;
 public class CboardDetailResponseDTO {
 
     private String id;
+    private String writer;
     private String title;
     private String content;
     private String fileUp;
     private List<String> hashTags;
-
+    private LocalDateTime boardTime;
 
     public CboardDetailResponseDTO(Cboard cboard){
         this.id = cboard.getCboardId();
+        this.writer = cboard.getWriter();
         this.title = cboard.getTitle();
         this.content = cboard.getContent();
         this.fileUp = cboard.getFileUp();
+        this.boardTime = cboard.getBoardTime();
 
         this.hashTags = cboard.getHashTags()
                 .stream()

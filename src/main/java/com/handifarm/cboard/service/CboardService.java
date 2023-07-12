@@ -10,6 +10,9 @@ import com.handifarm.cboard.entity.Cboard;
 import com.handifarm.cboard.entity.HashTag;
 import com.handifarm.cboard.repository.CboardRepository;
 import com.handifarm.cboard.repository.HashTagRepository;
+import com.handifarm.recontent.dto.response.RecontentDetailResponseDTO;
+import com.handifarm.recontent.entity.Recontent;
+import com.handifarm.recontent.service.RecontentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,7 +59,13 @@ public class CboardService {
         List<Cboard> cboardList = entityList.getContent();
 
         List<CboardDetailResponseDTO> dtoList = cboardList.stream()
-                .map(board -> new CboardDetailResponseDTO(board))
+                .map(board -> {
+                    List<Recontent> recontentList = RecontentService.retrieveByCboardId(board.getId());
+                    List<RecontentDetailResponseDTO> recontentDTOList = recontentList.stream()
+                            .map(recontent -> new RecontentDetailResponseDTO(recontent))
+                            .collect(Collectors.toList());
+                    return new CboardDetailResponseDTO(board, recontentDTOList)
+                })
                 .collect(Collectors.toList());
         return CboardListResponseDTO.builder()
                 .count(dtoList.size())
@@ -210,7 +219,7 @@ public class CboardService {
         CboardDetailResponseDTO modified = new CboardDetailResponseDTO(modifiedCboard);
 
         // 이전 페이지 조회
-        Pageable pageable = PageRequest.of(0, 10, Sort.by("boardTime").descending());
+        Pageable pageable = PageRequest.of(page -1, 10, Sort.by("boardTime").descending());
         Page<Cboard> pageData = cboardRepository.findAll(pageable);
 
 
