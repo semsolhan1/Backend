@@ -26,7 +26,7 @@ public class UserJoinRequestDTO {
     @NotBlank
     private String userName;
 
-    @Size(min = 2, max = 8)
+    @Size(max = 8)
     private String userNick;
 
     @NotBlank
