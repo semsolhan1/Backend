@@ -64,6 +64,13 @@ public class BoardService {
 
   }
 
+//  private Board getBoard(Board.Category category, String content) {
+//
+//
+//    return boardEntity;
+//
+//  }
+
   private Board getBoard(long board_no) {
     Board boardEntity = boardRepository.findById(board_no)
             .orElseThrow(
