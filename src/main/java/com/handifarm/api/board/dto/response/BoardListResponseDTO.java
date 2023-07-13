@@ -1,5 +1,6 @@
 package com.handifarm.api.board.dto.response;
 
+import com.handifarm.api.board.entity.Board;
 import lombok.*;
 
 import java.util.List;
@@ -15,4 +16,8 @@ public class BoardListResponseDTO {
 
     private BoardPageResponseDTO pageInfo;
 
+
+//    public BoardListResponseDTO(List<Board> boardList) {
+//        this.postList =
+//    }
 }

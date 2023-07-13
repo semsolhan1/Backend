@@ -19,6 +19,13 @@ public class BoardController {
 
     private final BoardService boardService;
 
+    // 게시글 전체 조회
+    @GetMapping
+    public ResponseEntity<?> retrieveBoard() {
+        BoardListResponseDTO boardList = boardService.retrieve();
+        return ResponseEntity.ok(boardList);
+    }
+
     // 특정 사용자 게시글 목록 조회
     @GetMapping("/{userId}")
     public ResponseEntity<?> retrieveBoard(@PathVariable String userId) {

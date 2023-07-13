@@ -1,6 +1,7 @@
 package com.handifarm.api.board.entity;
 
 import com.handifarm.api.user.entity.User;
+import jdk.jfr.Category;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -15,11 +16,12 @@ import java.time.LocalDateTime;
 public class Board {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private long boardNo;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long boardNo;
 
     @Column(nullable = false)
-    private String category;
+    @Enumerated(EnumType.STRING)
+    private Category category;
 
     @Column(nullable = false)
     private String title;
@@ -39,5 +41,11 @@ public class Board {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    public enum Category {
+        공지,
+        자유,
+        정보
+    };
 
 }

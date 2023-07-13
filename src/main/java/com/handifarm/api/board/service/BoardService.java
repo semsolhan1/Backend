@@ -9,6 +9,7 @@ import com.handifarm.api.board.repository.BoardRepository;
 import com.handifarm.api.user.entity.User;
 import com.handifarm.api.user.repository.UserRepository;
 import com.handifarm.jwt.TokenUserInfo;
+import jdk.jfr.Category;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,21 @@ public class BoardService implements IBoardService {
 
     private final UserRepository userRepository;
     private final BoardRepository boardRepository;
+
+
+    public BoardListResponseDTO retrieve() {
+
+
+        List<Board> entityList = boardRepository.findAll();
+
+        List<BoardDetailResponseDTO> dtoList = entityList.stream()
+                .map(BoardDetailResponseDTO::new)
+                .collect(Collectors.toList());
+
+        return BoardListResponseDTO.builder()
+                .postList(dtoList)
+                .build();
+    }
 
     @Override
     public BoardListResponseDTO retrieve(String userId) {
@@ -51,7 +67,7 @@ public class BoardService implements IBoardService {
     @Override
     public void registBoard(BoardWriteRequestDTO requestDTO, TokenUserInfo userInfo) {
         String userId = requestDTO.getUserId();
-        String category = requestDTO.getCategory();
+        Board.Category category = Board.Category.valueOf(requestDTO.getCategory());
         String title = requestDTO.getTitle();
         String content = requestDTO.getContent();
 
