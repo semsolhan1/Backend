@@ -37,7 +37,7 @@ public class BoardController {
     @PostMapping
     public ResponseEntity<?> registBoard(@RequestBody BoardWriteRequestDTO requestDTO, TokenUserInfo userInfo) {
         boardService.registBoard(requestDTO, userInfo);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.ok("게시글등록성공");
     }
 
     // 게시글 수정

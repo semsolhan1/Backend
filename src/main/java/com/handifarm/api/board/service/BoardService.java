@@ -66,21 +66,20 @@ public class BoardService implements IBoardService {
 
     @Override
     public void registBoard(BoardWriteRequestDTO requestDTO, TokenUserInfo userInfo) {
-        String userId = requestDTO.getUserId();
         Board.Category category = Board.Category.valueOf(requestDTO.getCategory());
         String title = requestDTO.getTitle();
         String content = requestDTO.getContent();
 
-        User user = getUser(userId);
+
 
         Board board = Board.builder()
-                .user(user)
                 .category(category)
                 .title(title)
                 .content(content)
                 .build();
 
         boardRepository.save(board);
+        log.info("게시글 등록 완료");
     }
 
     @Override

@@ -43,9 +43,9 @@ public class Board {
     private User user;
 
     public enum Category {
-        공지,
-        자유,
-        정보
+        notice,
+        free,
+        information
     };
 
 }

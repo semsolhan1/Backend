@@ -13,9 +13,6 @@ import javax.validation.constraints.Size;
 public class BoardWriteRequestDTO {
 
     @NotNull
-    private String userId;
-
-    @NotNull
     private String category;
 
     @NotNull
@@ -26,7 +23,7 @@ public class BoardWriteRequestDTO {
     private String content;
 
     public Board toEntity() {
-        return Board.builder().title(this.title).build();
+        return Board.builder().title(this.title).content(this.content).category(Board.Category.valueOf(this.category)).build();
     }
 
 }
