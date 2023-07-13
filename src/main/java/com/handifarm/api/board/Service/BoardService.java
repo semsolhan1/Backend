@@ -99,11 +99,5 @@ public class BoardService {
      boardRepository.deleteById(boardNo);
   }
 
-  public BoardService(BoardRepository boardRepository) {
-    this.boardRepository = boardRepository;
-  }
 
-  public List<Board> searchByCategory(Category category) {
-    return boardRepository.findByCategory(category);
-  }
 }

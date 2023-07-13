@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @Table(name = "tbl_board")
 public class Board {
 
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long boardNo; //글번호
@@ -39,5 +40,7 @@ public class Board {
   private LocalDateTime updateDate; //글 수정일
 
 
-
+  public enum Category {
+    REPORT, FREE, NOTIFY, ENQUIRY //자유, 정보, 공지, 질문
+  }
 }

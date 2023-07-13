@@ -30,7 +30,7 @@ public class BoardCreateDTO {
             .userId(this.userId)
             .content(this.content)
             .title(this.title)
-            .category(Category.valueOf(this.category))
+            .category(Board.Category.valueOf(this.category))
             .build();
   }
 
