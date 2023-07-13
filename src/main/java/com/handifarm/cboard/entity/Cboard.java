@@ -58,5 +58,12 @@ public class Cboard {
         }
     }
 
+    public void addRecontent(Recontent savedRecontent) {
+        recontents.add(savedRecontent);
+        if(this != savedRecontent.getCboard()){
+            savedRecontent.setCboard(this);
+        }
+    }
+
 
 }

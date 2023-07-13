@@ -22,6 +22,6 @@ public class RecontentListResponseDTO {
 
     private List<RecontentDetailResponseDTO> board;
 
-    private RecontentDetailResponseDTO previousCboard;
+//    private RecontentDetailResponseDTO previousCboard;
 
 }

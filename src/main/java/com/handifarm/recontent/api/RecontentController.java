@@ -4,7 +4,6 @@ package com.handifarm.recontent.api;
 import com.handifarm.recontent.dto.page.RecontentPageDTO;
 import com.handifarm.recontent.dto.request.RecontentCreateRequestDTO;
 import com.handifarm.recontent.dto.response.RecontentListResponseDTO;
-import com.handifarm.recontent.entity.Recontent;
 import com.handifarm.recontent.service.RecontentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,9 +26,9 @@ public class RecontentController {
 
     //댓글 목록
     @GetMapping
-    public ResponseEntity<?> retrieveList(Recontent cboard , RecontentPageDTO pageDTO){
+    public ResponseEntity<?> retrieveList(String cboardId , RecontentPageDTO pageDTO){
 
-        RecontentListResponseDTO dto = recontentService.contentretrieve(cboard , pageDTO);
+        RecontentListResponseDTO dto = recontentService.contentretrieve(cboardId , pageDTO);
 
         return ResponseEntity.ok().body(dto);
     }
@@ -38,7 +37,8 @@ public class RecontentController {
     @PostMapping
     public ResponseEntity<?> createRecontent(
             @Validated @RequestBody RecontentCreateRequestDTO dto,
-            BindingResult result
+            BindingResult result,
+            RecontentPageDTO page
     ){
 
         log.info("/api/recontent/post -{}",dto);
@@ -55,7 +55,7 @@ public class RecontentController {
 
         try {
 
-            RecontentListResponseDTO recontentListResponseDTO = recontentService.create(dto);
+            RecontentListResponseDTO recontentListResponseDTO = recontentService.create(dto,page);
             return ResponseEntity.ok().body(recontentListResponseDTO);
         } catch (IllegalStateException e){
             log.warn(e.getMessage());

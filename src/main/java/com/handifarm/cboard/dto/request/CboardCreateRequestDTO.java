@@ -1,6 +1,7 @@
 package com.handifarm.cboard.dto.request;
 
 import com.handifarm.cboard.entity.Cboard;
+import com.handifarm.recontent.entity.Recontent;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
@@ -28,6 +29,8 @@ public class CboardCreateRequestDTO {
     private String content;
 
     private List<String> hashTags;
+
+    private List<Recontent> recontents;
 
     private LocalDateTime boardTime;
 

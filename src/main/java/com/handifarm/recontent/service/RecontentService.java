@@ -26,9 +26,10 @@ import java.util.stream.Collectors;
 @Transactional
 public class RecontentService {
 
+
     private final RecontentRepository recontentRepository;
 
-    public RecontentListResponseDTO contentretrieve(Recontent cboard, RecontentPageDTO dto) {
+    public RecontentListResponseDTO contentretrieve(String cboardId, RecontentPageDTO dto) {
 
         Pageable pageable = PageRequest.of(
                 dto.getRepage()-1,
@@ -37,8 +38,8 @@ public class RecontentService {
         );
 
         Page<Recontent> entityList;
-        if (cboard != null) {
-            entityList = recontentRepository.findByCboardId(cboard.getCboard().getCboardId(), pageable);
+        if (cboardId != null) {
+            entityList = recontentRepository.findByCboard_CboardId(cboardId, pageable);
         } else {
             throw new IllegalArgumentException("cboard cannot be null.");
         }
@@ -56,7 +57,33 @@ public class RecontentService {
     }
 
 
-    public RecontentListResponseDTO create(RecontentCreateRequestDTO dto) {
-        return null;
+    public RecontentListResponseDTO create(RecontentCreateRequestDTO dto, RecontentPageDTO pageDTO)
+            throws RuntimeException, IllegalStateException{
+
+        Pageable pageable = PageRequest.of(
+                pageDTO.getRepage()-1,
+                pageDTO.getResize(),
+                Sort.by("recontentTime").descending()
+        );
+
+        Page<Recontent> entityList = recontentRepository.findAll(pageable);
+
+
+        Recontent recontentEntity = dto.toEntity();
+        recontentRepository.save(recontentEntity);
+
+
+        // 댓글 생성 이후에 댓글 목록을 조회
+        List<Recontent> recontentList = (List<Recontent>) contentretrieve(recontentEntity.getCboard().getCboardId(), new RecontentPageDTO());
+
+        List<RecontentDetailResponseDTO> recontentDTOList = recontentList.stream()
+                .map(content -> new RecontentDetailResponseDTO(content))
+                .collect(Collectors.toList());
+
+        return RecontentListResponseDTO.builder()
+                .count(recontentDTOList.size())
+                .pageInfo(new RecontentPageResponseDTO(entityList))
+                .board(recontentDTOList)
+                .build();
     }
 }

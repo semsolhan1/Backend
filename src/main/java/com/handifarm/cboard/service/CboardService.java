@@ -10,11 +10,14 @@ import com.handifarm.cboard.entity.Cboard;
 import com.handifarm.cboard.entity.HashTag;
 import com.handifarm.cboard.repository.CboardRepository;
 import com.handifarm.cboard.repository.HashTagRepository;
+import com.handifarm.recontent.dto.page.RecontentPageDTO;
 import com.handifarm.recontent.dto.response.RecontentDetailResponseDTO;
 import com.handifarm.recontent.entity.Recontent;
+import com.handifarm.recontent.repository.RecontentRepository;
 import com.handifarm.recontent.service.RecontentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -41,6 +44,11 @@ public class CboardService {
 
     private final HashTagRepository hashTagRepository;
 
+    private final RecontentRepository recontentRepository;
+
+    @Autowired
+    private final RecontentService recontentService;
+
     @Value("${upload.path}")
     private String uploadRootPath;
 
@@ -58,13 +66,15 @@ public class CboardService {
 
         List<Cboard> cboardList = entityList.getContent();
 
+
         List<CboardDetailResponseDTO> dtoList = cboardList.stream()
                 .map(board -> {
-                    List<Recontent> recontentList = RecontentService.retrieveByCboardId(board.getId());
+                    String recontentId = board.getCboardId();
+                    List<Recontent> recontentList = (List<Recontent>) recontentService.contentretrieve(recontentId ,new RecontentPageDTO());
                     List<RecontentDetailResponseDTO> recontentDTOList = recontentList.stream()
-                            .map(recontent -> new RecontentDetailResponseDTO(recontent))
+                            .map(content -> new RecontentDetailResponseDTO(content))
                             .collect(Collectors.toList());
-                    return new CboardDetailResponseDTO(board, recontentDTOList)
+                    return new CboardDetailResponseDTO(board, recontentDTOList);
                 })
                 .collect(Collectors.toList());
         return CboardListResponseDTO.builder()
@@ -83,6 +93,8 @@ public class CboardService {
 
         List<String> hashTags = dto.getHashTags();
 
+        List<Recontent> recontents = dto.getRecontents();
+
         Cboard saved = cboardRepository.save(cboard);
 
         if(hashTags != null && hashTags.size() > 0){
@@ -92,12 +104,23 @@ public class CboardService {
                             .hashName(hashtag)
                             .cboard(saved)
                             .build()
-
                 );
-
                 saved.addHashTag(savedTag);
             });
         }
+
+        if(hashTags != null && hashTags.size() > 0){
+            hashTags.forEach(hashtag -> {
+                HashTag savedTag = hashTagRepository.save(
+                        HashTag.builder()
+                                .hashName(hashtag)
+                                .cboard(saved)
+                                .build()
+                );
+                saved.addHashTag(savedTag);
+            });
+        }
+
 
         PageDTO pageDTO = new PageDTO();
 
