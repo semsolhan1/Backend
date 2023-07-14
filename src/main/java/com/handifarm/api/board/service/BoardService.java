@@ -70,8 +70,6 @@ public class BoardService implements IBoardService {
         String title = requestDTO.getTitle();
         String content = requestDTO.getContent();
 
-
-
         Board board = Board.builder()
                 .category(category)
                 .title(title)
@@ -80,6 +78,22 @@ public class BoardService implements IBoardService {
 
         boardRepository.save(board);
         log.info("게시글 등록 완료");
+    }
+
+    public BoardDetailResponseDTO showDetailBoard(Long boardNo) {
+        Board board = boardRepository.findById(boardNo)
+                .orElseThrow(() -> new RuntimeException("게시물을 찾을 수 없습니다."));
+
+        BoardDetailResponseDTO boardDetailResponseDTO = BoardDetailResponseDTO.builder()
+                .boardNo(board.getBoardNo())
+                .title(board.getTitle())
+                .content(board.getContent())
+                .category(board.getCategory().toString())
+                .createDate(board.getCreateDate())
+                .updateDate(board.getUpdateDate())
+                .build();
+
+        return boardDetailResponseDTO;
     }
 
     @Override

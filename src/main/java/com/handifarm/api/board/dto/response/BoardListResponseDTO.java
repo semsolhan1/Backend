@@ -17,7 +17,5 @@ public class BoardListResponseDTO {
     private BoardPageResponseDTO pageInfo;
 
 
-//    public BoardListResponseDTO(List<Board> boardList) {
-//        this.postList =
-//    }
+
 }

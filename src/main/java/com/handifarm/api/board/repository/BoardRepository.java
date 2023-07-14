@@ -31,3 +31,5 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     // 유저별 게시글 조회
     List<Board> findAllByUser(User user);
 }
+
+

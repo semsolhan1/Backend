@@ -2,6 +2,7 @@ package com.handifarm.api.board.controller;
 
 import com.handifarm.api.board.dto.request.BoardModifyRequestDTO;
 import com.handifarm.api.board.dto.request.BoardWriteRequestDTO;
+import com.handifarm.api.board.dto.response.BoardDetailResponseDTO;
 import com.handifarm.api.board.dto.response.BoardListResponseDTO;
 import com.handifarm.api.board.service.BoardService;
 import com.handifarm.jwt.TokenUserInfo;
@@ -26,12 +27,21 @@ public class BoardController {
         return ResponseEntity.ok(boardList);
     }
 
-    // 특정 사용자 게시글 목록 조회
-    @GetMapping("/{userId}")
-    public ResponseEntity<?> retrieveBoard(@PathVariable String userId) {
-        BoardListResponseDTO boardList = boardService.retrieve(userId);
-        return ResponseEntity.ok(boardList);
+    // 특정 게시글 조회
+    @GetMapping("/{boardNo}")
+    public ResponseEntity<?> detailBoard(@PathVariable long boardNo) {
+        BoardDetailResponseDTO boardDetail = boardService.showDetailBoard(boardNo);
+        log.info(boardDetail.toString());
+        return ResponseEntity.ok(boardDetail);
     }
+
+
+//    // 특정 사용자 게시글 목록 조회
+//    @GetMapping("/{userId}")
+//    public ResponseEntity<?> retrieveBoard(@PathVariable String userId) {
+//        BoardListResponseDTO boardList = boardService.retrieve(userId);
+//        return ResponseEntity.ok(boardList);
+//    }
 
     // 게시글 등록
     @PostMapping

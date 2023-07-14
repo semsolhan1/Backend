@@ -3,7 +3,6 @@ package com.handifarm.api.board.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.handifarm.api.board.entity.Board;
 import lombok.*;
-import net.bytebuddy.asm.Advice;
 
 import java.time.LocalDateTime;
 
