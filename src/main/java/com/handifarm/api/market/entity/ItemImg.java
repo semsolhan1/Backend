@@ -5,7 +5,8 @@ import lombok.*;
 import javax.persistence.*;
 
 @Setter @Getter
-@ToString @EqualsAndHashCode()
+@ToString(exclude = "marketItem")
+@EqualsAndHashCode()
 @NoArgsConstructor @AllArgsConstructor
 @Builder
 @Entity

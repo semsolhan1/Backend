@@ -2,13 +2,15 @@ package com.handifarm.api.market.entity;
 
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Setter @Getter
-@ToString @EqualsAndHashCode()
+@ToString(exclude = "itemImgs")
+@EqualsAndHashCode()
 @NoArgsConstructor @AllArgsConstructor
 @Builder
 @Entity
@@ -36,6 +38,7 @@ public class MarketItem {
     @CreationTimestamp
     private LocalDateTime createDate;
 
+    @UpdateTimestamp
     private LocalDateTime updateDate;
 
     @OneToMany(mappedBy = "marketItem", cascade = CascadeType.REMOVE)
