@@ -24,10 +24,11 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     void modifyBoard(Long boardNo, String title, String content);
 
     // 게시글 삭제
-    @Modifying
     @Query("DELETE FROM Board b WHERE b.boardNo = :boardNo")
     void deleteBoard(Long boardNo);
 
     // 유저별 게시글 조회
     List<Board> findAllByUser(User user);
 }
+
+

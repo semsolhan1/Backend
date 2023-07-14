@@ -10,7 +10,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Setter @Getter @ToString
-@EqualsAndHashCode() @NoArgsConstructor @AllArgsConstructor
+@EqualsAndHashCode @NoArgsConstructor @AllArgsConstructor
 @Builder @Entity
 @Table(name = "tbl_board")
 public class Board {
