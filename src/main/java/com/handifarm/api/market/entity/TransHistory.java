@@ -1,12 +1,18 @@
 package com.handifarm.api.market.entity;
 
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+@Setter @Getter
+@ToString @EqualsAndHashCode()
+@NoArgsConstructor @AllArgsConstructor
+@Builder
 @Entity
+@Table(name = "tbl_trans_history")
 public class TransHistory {
 
     @Id

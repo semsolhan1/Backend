@@ -1,8 +1,15 @@
 package com.handifarm.api.market.entity;
 
+import lombok.*;
+
 import javax.persistence.*;
 
+@Setter @Getter
+@ToString @EqualsAndHashCode()
+@NoArgsConstructor @AllArgsConstructor
+@Builder
 @Entity
+@Table(name = "tbl_item_img")
 public class ItemImg {
 
     @Id
@@ -11,8 +18,6 @@ public class ItemImg {
 
     @Column(nullable = false)
     private String imgLink;
-
-    private long itemNo;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_no")

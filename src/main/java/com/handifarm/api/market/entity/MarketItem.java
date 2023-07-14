@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "tbl_marketItem")
+@Table(name = "tbl_market_item")
 public class MarketItem {
 
     @Id
@@ -36,7 +36,17 @@ public class MarketItem {
     @CreationTimestamp
     private LocalDateTime createDate;
 
+    private LocalDateTime updateDate;
+
     @OneToMany(mappedBy = "marketItem", cascade = CascadeType.REMOVE)
     private List<ItemImg> itemImgs;
+
+    // 양방향 매핑에서 리스트 쪽에 데이터를 추가하는 편의 메서드 생성
+    public void addItemImg(ItemImg itemImg) {
+        itemImgs.add(itemImg);
+        if(this != itemImg.getMarketItem()) {
+            itemImg.setMarketItem(this);
+        }
+    }
 
 }
