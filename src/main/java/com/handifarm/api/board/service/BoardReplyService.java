@@ -20,10 +20,13 @@ public class BoardReplyService {
     private final BoardReplyRepository boardReplyRepository;
 
     public void registBoardReply(BoardReplyWriteRequestDTO requestDTO, TokenUserInfo userInfo) {
-        String userNick = requestDTO.getUserNick();
+        String userNick = userInfo.getUserNick();
+        Long boardNo = requestDTO.getBoardNo();
         String boardReplyContent = requestDTO.getBoardReplyContent();
 
         BoardReply boardReply = BoardReply.builder()
+                .userNick(userNick)
+                .boardNo((boardNo))
                 .boardReplyContent(boardReplyContent)
                 .build();
 

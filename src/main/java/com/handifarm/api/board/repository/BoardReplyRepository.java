@@ -9,11 +9,11 @@ public interface BoardReplyRepository extends JpaRepository<BoardReply, Long> {
 
     // 댓글 수정
     @Modifying
-    @Query("UPDATE BoardReply br SET br.reply = :reply WHERE br.userNick = :userNick")
-    void modifyBoardReply(String reply, String userNick);
+    @Query("UPDATE BoardReply br SET br.boardReplyContent = :boardReplyContent WHERE br.userNick = :userNick")
+    void modifyBoardReply(String boardReplyContent, String userNick);
 
     // 댓글 삭제
-    @Query("DELETE FROM BoardReply br WHERE br.replyNo = :replyNo")
-    void deleteBoardReply(Long boardNo);
+    @Query("DELETE FROM BoardReply br WHERE br.boardReplyNo = :boardReplyNo")
+    void deleteBoardReply(Long boardReplyNo);
 
 }

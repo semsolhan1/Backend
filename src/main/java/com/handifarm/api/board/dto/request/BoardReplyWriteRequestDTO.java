@@ -19,10 +19,11 @@ public class BoardReplyWriteRequestDTO {
     private String boardReplyContent;
 
     @NotNull
-    private String userNick;
+    private Long boardNo;
 
     public BoardReply toEntity() {
-        return BoardReply.builder().boardReplyContent(this.boardReplyContent).userNick(this.userNick).build();
+        return BoardReply.builder().boardNo(this.boardNo).boardReplyContent(this.boardReplyContent).build();
     }
+
 
 }

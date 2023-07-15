@@ -43,8 +43,8 @@ public class BoardService implements IBoardService {
     }
 
     @Override
-    public BoardListResponseDTO retrieve(String userId) {
-        User user = getUser(userId);
+    public BoardListResponseDTO retrieve(String userNick) {
+        User user = getUser(userNick);
 
         List<Board> entityList = boardRepository.findAllByUser(user);
 
@@ -56,8 +56,8 @@ public class BoardService implements IBoardService {
                 .postList(dtoList)
                 .build();
     }
-    private User getUser(String userId) {
-        User user = userRepository.findById(userId).orElseThrow(
+    private User getUser(String userNick) {
+        User user = userRepository.findById(userNick).orElseThrow(
                 () -> new RuntimeException("회원 정보가 없습니다.")
         );
         return user;

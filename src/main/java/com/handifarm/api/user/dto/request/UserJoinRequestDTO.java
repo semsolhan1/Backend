@@ -51,7 +51,7 @@ public class UserJoinRequestDTO {
                 .userId(this.userId)
                 .userPw(this.userPw)
                 .userName(this.userName)
-                .userNick(this.userNick)
+                .userNick(this.userNick != null ? this.userNick : this.userId)
                 .userEmail(this.userEmail)
                 .userPhoneNum(this.userPhoneNum)
                 .addrBasic(this.addrBasic)

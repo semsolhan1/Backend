@@ -7,7 +7,7 @@ import com.handifarm.jwt.TokenUserInfo;
 
 public interface IBoardService {
 
-    BoardListResponseDTO retrieve(String userId);
+    BoardListResponseDTO retrieve(String userNick);
 
     void registBoard(BoardWriteRequestDTO requestDTO, TokenUserInfo userInfo);
 

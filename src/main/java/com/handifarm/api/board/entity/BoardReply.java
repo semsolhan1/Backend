@@ -22,6 +22,9 @@ public class BoardReply {
     private Long boardReplyNo;
 
     @Column(nullable = false)
+    private Long boardNo;
+
+    @Column(nullable = false)
     private String userNick;
 
     @Column(nullable = false)
@@ -32,6 +35,8 @@ public class BoardReply {
 
     @UpdateTimestamp
     private LocalDateTime updateDate;
+
+
 
 
 }

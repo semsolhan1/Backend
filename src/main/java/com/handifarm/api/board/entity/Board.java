@@ -39,7 +39,7 @@ public class Board {
     private LocalDateTime updateDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_nick")
     private User user;
 
     public enum Category {

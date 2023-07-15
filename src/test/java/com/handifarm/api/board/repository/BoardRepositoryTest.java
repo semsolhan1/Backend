@@ -26,9 +26,9 @@ class BoardRepositoryTest {
         //given
         for (int i = 1; i <= 100; i++) {
             String userId = "abc1234";
-            String category = "free";
-            String title = "제목 " + i;
-            String content = "집가자 배고프다 " + i;
+            String category = "information";
+            String title = "정보 " + i;
+            String content = "정보내용 " + i;
 
             BoardWriteRequestDTO requestDTO = new BoardWriteRequestDTO();
             requestDTO.setCategory(category);
