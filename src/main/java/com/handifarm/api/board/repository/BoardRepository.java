@@ -5,7 +5,6 @@ import com.handifarm.api.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -29,6 +28,13 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     // 유저별 게시글 조회
     List<Board> findAllByUser(User user);
+
+
+
+
+
+
+
 }
 
 

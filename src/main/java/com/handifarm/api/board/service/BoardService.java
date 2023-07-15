@@ -8,10 +8,15 @@ import com.handifarm.api.board.entity.Board;
 import com.handifarm.api.board.repository.BoardRepository;
 import com.handifarm.api.user.entity.User;
 import com.handifarm.api.user.repository.UserRepository;
+import com.handifarm.api.util.page.PageDTO;
+import com.handifarm.api.util.page.PageResponseDTO;
 import com.handifarm.jwt.TokenUserInfo;
-import jdk.jfr.Category;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,9 +32,7 @@ public class BoardService implements IBoardService {
     private final UserRepository userRepository;
     private final BoardRepository boardRepository;
 
-
     public BoardListResponseDTO retrieve() {
-
 
         List<Board> entityList = boardRepository.findAll();
 
@@ -38,7 +41,7 @@ public class BoardService implements IBoardService {
                 .collect(Collectors.toList());
 
         return BoardListResponseDTO.builder()
-                .postList(dtoList)
+//                .postList(dtoList)
                 .build();
     }
 
@@ -53,7 +56,7 @@ public class BoardService implements IBoardService {
                 .collect(Collectors.toList());
 
         return BoardListResponseDTO.builder()
-                .postList(dtoList)
+//                .postList(dtoList)
                 .build();
     }
     private User getUser(String userNick) {
@@ -117,4 +120,28 @@ public class BoardService implements IBoardService {
 
         boardRepository.delete(board);
     }
+
+    public BoardListResponseDTO getPage(PageDTO dto) {
+        Pageable pageable = PageRequest.of(
+                dto.getPage() -1,
+                dto.getSize(),
+                Sort.by("createDate").descending()
+        );
+
+        Page<Board> boards = boardRepository.findAll(pageable);
+
+        List<Board> boardList = boards.getContent();
+
+        List<BoardDetailResponseDTO> detailList
+                = boardList.stream()
+                            .map(board -> new BoardDetailResponseDTO(board))
+                            .collect(Collectors.toList());
+
+        return BoardListResponseDTO.builder()
+                .postCount(detailList.size())
+                .pageInfo(new PageResponseDTO(boards))
+                .boards(detailList)
+                .build();
+    };
+
 }

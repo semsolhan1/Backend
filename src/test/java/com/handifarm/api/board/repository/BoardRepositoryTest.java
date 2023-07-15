@@ -25,8 +25,7 @@ class BoardRepositoryTest {
     void registTest() {
         //given
         for (int i = 1; i <= 100; i++) {
-            String userId = "abc1234";
-            String category = "information";
+            String category = "INFORMATION";
             String title = "정보 " + i;
             String content = "정보내용 " + i;
 

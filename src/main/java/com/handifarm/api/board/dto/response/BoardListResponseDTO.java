@@ -1,21 +1,19 @@
 package com.handifarm.api.board.dto.response;
 
-import com.handifarm.api.board.entity.Board;
+import com.handifarm.api.util.page.PageResponseDTO;
 import lombok.*;
 
 import java.util.List;
 
 @Getter @Setter @ToString
-@EqualsAndHashCode @NoArgsConstructor @AllArgsConstructor
+@EqualsAndHashCode @AllArgsConstructor
 @Builder
 public class BoardListResponseDTO {
 
-    private List<BoardDetailResponseDTO> postList;
-
     private int postCount;
 
-    private BoardPageResponseDTO pageInfo;
+    private PageResponseDTO pageInfo;
 
-
+    private List<BoardDetailResponseDTO> boards;
 
 }

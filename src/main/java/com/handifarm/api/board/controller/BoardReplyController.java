@@ -22,7 +22,7 @@ public class BoardReplyController {
 
     // 댓글 등록
     @PostMapping
-    public ResponseEntity<?> registBoardReply(@AuthenticationPrincipal TokenUserInfo userInfo, @RequestBody BoardReplyWriteRequestDTO requestDTO) {
+    public ResponseEntity<?> registBoardReply(@AuthenticationPrincipal TokenUserInfo userInfo, @PathVariable long boardNo, @RequestBody BoardReplyWriteRequestDTO requestDTO) {
         // 댓글 등록 로직을 boardReplyService에서 처리하도록 호출
         boardReplyService.registBoardReply(requestDTO, userInfo);
         return ResponseEntity.ok("댓글 등록 성공");

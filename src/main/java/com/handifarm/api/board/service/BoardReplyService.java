@@ -26,7 +26,6 @@ public class BoardReplyService {
 
         BoardReply boardReply = BoardReply.builder()
                 .userNick(userNick)
-                .boardNo((boardNo))
                 .boardReplyContent(boardReplyContent)
                 .build();
 

@@ -5,6 +5,7 @@ import com.handifarm.api.board.dto.request.BoardWriteRequestDTO;
 import com.handifarm.api.board.dto.response.BoardDetailResponseDTO;
 import com.handifarm.api.board.dto.response.BoardListResponseDTO;
 import com.handifarm.api.board.service.BoardService;
+import com.handifarm.api.util.page.PageDTO;
 import com.handifarm.jwt.TokenUserInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +23,9 @@ public class BoardController {
 
     // 게시글 전체 조회
     @GetMapping
-    public ResponseEntity<?> retrieveBoard() {
-        BoardListResponseDTO boardList = boardService.retrieve();
+    public ResponseEntity<?> getBoard(@RequestParam("page") int page, @RequestParam("size") int size) {
+        PageDTO dto = new PageDTO(page, size);
+        BoardListResponseDTO boardList = boardService.getPage(dto);
         return ResponseEntity.ok(boardList);
     }
 

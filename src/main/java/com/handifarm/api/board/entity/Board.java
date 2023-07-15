@@ -8,6 +8,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Setter @Getter @ToString
 @EqualsAndHashCode @NoArgsConstructor @AllArgsConstructor
@@ -42,10 +44,21 @@ public class Board {
     @JoinColumn(name = "user_nick")
     private User user;
 
+    @OneToMany(mappedBy = "board", orphanRemoval = true)
+    private List<BoardReply> replies = new ArrayList<>();
+
+    // 양방향 매핑에서 리스트쪽에 데이터를 추가하는 편의메서드 생성
+    public void addReply(BoardReply reply) {
+        replies.add(reply);
+        if(this != reply.getBoard()) {
+            reply.setBoard(this);
+        }
+    }
+
     public enum Category {
-        notice,
-        free,
-        information
+        NOTICE,
+        FREE,
+        INFORMATION
     };
 
 }

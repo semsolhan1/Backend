@@ -22,7 +22,7 @@ public class BoardReplyWriteRequestDTO {
     private Long boardNo;
 
     public BoardReply toEntity() {
-        return BoardReply.builder().boardNo(this.boardNo).boardReplyContent(this.boardReplyContent).build();
+        return BoardReply.builder().boardReplyContent(this.boardReplyContent).build();
     }
 
 
