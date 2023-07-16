@@ -5,12 +5,14 @@ import com.handifarm.api.board.dto.request.BoardWriteRequestDTO;
 import com.handifarm.api.board.dto.response.BoardDetailResponseDTO;
 import com.handifarm.api.board.dto.response.BoardListResponseDTO;
 import com.handifarm.api.board.service.BoardService;
+import com.handifarm.api.user.entity.User;
 import com.handifarm.api.util.page.PageDTO;
 import com.handifarm.jwt.TokenUserInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -37,19 +39,12 @@ public class BoardController {
         return ResponseEntity.ok(boardDetail);
     }
 
-
-//    // 특정 사용자 게시글 목록 조회
-//    @GetMapping("/{userId}")
-//    public ResponseEntity<?> retrieveBoard(@PathVariable String userId) {
-//        BoardListResponseDTO boardList = boardService.retrieve(userId);
-//        return ResponseEntity.ok(boardList);
-//    }
-
     // 게시글 등록
     @PostMapping
-    public ResponseEntity<?> registBoard(@RequestBody BoardWriteRequestDTO requestDTO, TokenUserInfo userInfo) {
+    public ResponseEntity<?> registBoard(@AuthenticationPrincipal TokenUserInfo userInfo,
+                                         @RequestBody BoardWriteRequestDTO requestDTO) {
         boardService.registBoard(requestDTO, userInfo);
-        return ResponseEntity.ok("게시글등록성공");
+        return ResponseEntity.ok("게시글 등록 성공");
     }
 
     // 게시글 수정
@@ -60,12 +55,21 @@ public class BoardController {
         return ResponseEntity.ok().build();
     }
 
+
     // 게시글 삭제
     @DeleteMapping("/{boardNo}")
-    public ResponseEntity<?> deleteBoard(@PathVariable long boardNo) {
-        boardService.deleteBoard(boardNo);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> deleteBoard(@PathVariable long boardNo,
+                                         @AuthenticationPrincipal TokenUserInfo userInfo) {
+        try {
+            boardService.deleteBoard(boardNo, userInfo);
+            return ResponseEntity.ok("게시글 삭제 성공");
+            
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
     }
+
+
 
 
 

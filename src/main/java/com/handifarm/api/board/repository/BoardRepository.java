@@ -2,6 +2,7 @@ package com.handifarm.api.board.repository;
 
 import com.handifarm.api.board.entity.Board;
 import com.handifarm.api.user.entity.User;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Repository
 public interface BoardRepository extends JpaRepository<Board, Long> {
+
 
 
     // 게시글 개수 리턴
@@ -25,9 +27,6 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     // 게시글 삭제
     @Query("DELETE FROM Board b WHERE b.boardNo = :boardNo")
     void deleteBoard(Long boardNo);
-
-    // 유저별 게시글 조회
-    List<Board> findAllByUser(User user);
 
 
 

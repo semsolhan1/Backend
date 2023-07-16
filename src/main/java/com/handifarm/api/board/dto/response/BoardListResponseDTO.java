@@ -12,8 +12,11 @@ public class BoardListResponseDTO {
 
     private int postCount;
 
+    private int totalPages;
+
     private PageResponseDTO pageInfo;
 
     private List<BoardDetailResponseDTO> boards;
 
 }
+

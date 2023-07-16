@@ -2,6 +2,7 @@ package com.handifarm.api.board.repository;
 
 import com.handifarm.api.board.dto.request.BoardWriteRequestDTO;
 import com.handifarm.api.board.service.BoardService;
+import com.handifarm.api.user.entity.User;
 import com.handifarm.jwt.TokenUserInfo;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,7 @@ class BoardRepositoryTest {
             String category = "INFORMATION";
             String title = "정보 " + i;
             String content = "정보내용 " + i;
+            String userNick = "곰돌";
 
             BoardWriteRequestDTO requestDTO = new BoardWriteRequestDTO();
             requestDTO.setCategory(category);
@@ -35,12 +37,13 @@ class BoardRepositoryTest {
             requestDTO.setContent(content);
 
             TokenUserInfo userInfo = new TokenUserInfo();
-        //when
+            userInfo.setUserNick(userNick);
+
+            //when
             boardService.registBoard(requestDTO, userInfo);
-        //then
-    }
+
+        }
 
     }
-
 
 }

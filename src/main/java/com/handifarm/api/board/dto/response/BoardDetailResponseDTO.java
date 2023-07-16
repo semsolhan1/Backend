@@ -25,10 +25,13 @@ public class BoardDetailResponseDTO {
 
     public BoardDetailResponseDTO(Board board) {
         this.boardNo = board.getBoardNo();
+        this.userNick = board.getUserNick();
         this.category = board.getCategory().toString();
         this.title = board.getTitle();
         this.content = board.getContent();
+        this.views = board.getViews();
         this.createDate = board.getCreateDate();
         this.updateDate = board.getUpdateDate();
     }
+
 }
