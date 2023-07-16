@@ -23,6 +23,7 @@ spring:
 
 logging.level:
   org.hibernate.SQL: debug
+  org.springframework.web: ERROR
 
 # swagger setting
 spring-doc:

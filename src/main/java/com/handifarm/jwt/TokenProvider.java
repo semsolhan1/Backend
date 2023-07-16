@@ -35,7 +35,7 @@ public class TokenProvider {
         );
 
         Map<String, Object> claims = new HashMap<>();
-        claims.put("id", userEntity.getUserId());
+        claims.put("nick", userEntity.getUserNick());
 
         return Jwts.builder()
                 .signWith(
@@ -67,6 +67,7 @@ public class TokenProvider {
 
         return TokenUserInfo.builder()
                 .userId(claims.getSubject())
+                .userNick(claims.get("nick", String.class))
                 .build();
 
     }

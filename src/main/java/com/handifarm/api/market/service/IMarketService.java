@@ -4,14 +4,19 @@ import com.handifarm.api.market.dto.request.MarketItemCreateRequestDTO;
 import com.handifarm.api.market.dto.request.MarketItemModifyRequestDTO;
 import com.handifarm.api.market.dto.response.MarketItemListResponseDTO;
 import com.handifarm.api.market.dto.response.MarketItemResponseDTO;
+import com.handifarm.api.util.page.PageDTO;
+import com.handifarm.jwt.TokenUserInfo;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 public interface IMarketService {
 
     // 판매 게시글 목록 요청
-    MarketItemListResponseDTO getItemList();
+    MarketItemListResponseDTO getItemList(PageDTO pageDTO);
 
     // 판매 게시글 등록
-    void registItem(MarketItemCreateRequestDTO requestDTO);
+    MarketItemResponseDTO registItem(TokenUserInfo userInfo, MarketItemCreateRequestDTO requestDTO, List<MultipartFile> itemImgs);
 
     // 판매 게시글 조회
     MarketItemResponseDTO getItem(long itemNo);

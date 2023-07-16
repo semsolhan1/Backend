@@ -32,7 +32,7 @@ public class MarketItem {
     @Column(nullable = false)
     private int price;
 
-    @Column(columnDefinition = "boolean default 'false'")
+    @Column(columnDefinition = "boolean default false")
     private boolean done;
 
     @CreationTimestamp

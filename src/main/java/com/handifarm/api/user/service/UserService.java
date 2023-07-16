@@ -44,11 +44,13 @@ public class UserService implements IUserService {
     @Value("${sendMsg.sendNumber}")
     private String sendNumber;
 
+    // ID 중복 체크
     @Override
     public boolean idDuplicateCheck(String userId) {
         return userRepository.existsByUserId(userId);
     }
 
+    // 휴대폰 인증번호 전송
     @Override
     public String sendMessage(String phoneNum) {
         log.info("서비스에서 넘겨받은 변수 : {}", phoneNum);
@@ -81,6 +83,7 @@ public class UserService implements IUserService {
         return String.valueOf(checkNum);
     }
 
+    // 회원가입 처리
     @Override
     public void join(final UserJoinRequestDTO dto) {
 
@@ -103,6 +106,7 @@ public class UserService implements IUserService {
         log.info("회원가입 처리 완료!");
     }
 
+    // 로그인 처리 및 토큰 발급
     @Override
     public UserLoginResponseDTO authenticate(UserLoginRequestDTO dto) {
 
@@ -123,6 +127,7 @@ public class UserService implements IUserService {
         return new UserLoginResponseDTO(user, token);
     }
 
+    // 프로필 이미지 등록
     @Override
     public String uploadUserProfileImg(TokenUserInfo userInfo, MultipartFile profileImg) throws Exception {
 

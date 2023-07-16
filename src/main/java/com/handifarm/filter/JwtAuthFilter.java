@@ -68,7 +68,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("토큰이 위조 되었습니다.");
+            log.error("토큰이 위조 되었거나 만료되었습니다.");
         }
 
         // 필터 체인에 내가 만든 필터 실행 명령

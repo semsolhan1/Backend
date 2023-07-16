@@ -8,10 +8,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface IUserService {
 
-    // id 중복체크
+    // ID 중복 체크
     boolean idDuplicateCheck(final String userId);
 
-    // 휴대폰 인증번호 발송 및 프론트로 리턴
+    // 휴대폰 인증번호 전송
     String sendMessage(final String phoneNum);
 
     // 회원가입 처리
