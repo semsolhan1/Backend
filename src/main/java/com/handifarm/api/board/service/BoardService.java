@@ -84,8 +84,14 @@ public class BoardService implements IBoardService {
         String title = requestDTO.getTitle();
         String content = requestDTO.getContent();
 
+
         Board board = boardRepository.findById(boardNo)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+
+        long existingBoardNo = board.getBoardNo();
+        String existingTitle = board.getTitle();
+        String existingCategory = String.valueOf(board.getCategory());
+        String existingContent = board.getContent();
 
         board.setTitle(title);
         board.setContent(content);

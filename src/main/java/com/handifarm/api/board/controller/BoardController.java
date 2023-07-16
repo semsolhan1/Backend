@@ -48,6 +48,7 @@ public class BoardController {
     }
 
     // 게시글 수정
+    @CrossOrigin(origins = {"http://localhost:3000"})
     @PutMapping("/{boardNo}")
     public ResponseEntity<?> updateBoard(@PathVariable long boardNo, @RequestBody BoardModifyRequestDTO requestDTO) {
         requestDTO.setBoardNo(boardNo);
