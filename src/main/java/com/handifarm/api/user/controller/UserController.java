@@ -71,7 +71,6 @@ public class UserController {
             log.warn(e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-
     }
 
     // 로그인 요청 처리
