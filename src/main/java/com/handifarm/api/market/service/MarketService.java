@@ -39,7 +39,7 @@ public class MarketService implements IMarketService {
 
     // 판매 게시글 목록 요청
     @Override
-    public MarketItemListResponseDTO getItemList(PageDTO dto) {
+    public MarketItemListResponseDTO getItemList(final PageDTO dto) {
 
         //Pageable 객체 생성
         Pageable pageable = PageRequest.of(
@@ -52,7 +52,8 @@ public class MarketService implements IMarketService {
 
         List<MarketItem> itemList = marketItems.getContent();
 
-        List<MarketItemResponseDTO> itemResponseDTOList = itemList.stream().map(MarketItemResponseDTO::new).collect(Collectors.toList());
+        List<MarketItemResponseDTO> itemResponseDTOList =
+                itemList.stream().map(MarketItemResponseDTO::new).collect(Collectors.toList());
 
         return MarketItemListResponseDTO.builder()
                 .count(itemResponseDTOList.size())
@@ -63,7 +64,10 @@ public class MarketService implements IMarketService {
 
     // 판매 게시글 등록
     @Override
-    public MarketItemResponseDTO registItem(TokenUserInfo userInfo, MarketItemCreateRequestDTO requestDTO, List<MultipartFile> itemImgs) {
+    public MarketItemResponseDTO registItem(
+            final TokenUserInfo userInfo,
+            final MarketItemCreateRequestDTO requestDTO,
+            final List<MultipartFile> itemImgs) {
 
         if (!userInfo.getUserNick().equals(requestDTO.getSeller())) {
             throw new RuntimeException("인증이 유효하지 않습니다.");
@@ -99,20 +103,43 @@ public class MarketService implements IMarketService {
 
     // 판매 게시글 조회
     @Override
-    public MarketItemResponseDTO getItem(long itemNo) {
-        return null;
+    public MarketItemResponseDTO getItem(final long itemNo) {
+        MarketItem marketItem = marketItemRepository.findById(itemNo)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 게시글 번호입니다."));
+        return new MarketItemResponseDTO(marketItem);
     }
 
     // 판매 게시글 수정
     @Override
-    public MarketItemResponseDTO modifyItem(MarketItemModifyRequestDTO requestDTO) {
+    public MarketItemResponseDTO modifyItem(final TokenUserInfo userInfo, final MarketItemModifyRequestDTO requestDTO) {
+        MarketItem marketItem = marketItemRepository.findById(requestDTO.getItemNo())
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 게시글 번호입니다."));
+
+        if (!userInfo.getUserNick().equals(marketItem.getSeller())) {
+            throw new RuntimeException("권한이 없습니다.");
+        }
+
+
+
         return null;
     }
 
     // 판매 게시글 삭제
     @Override
-    public void deleteItem(long itemNo) {
+    public void deleteItem(final TokenUserInfo userInfo, final long itemNo) {
+        MarketItem marketItem = marketItemRepository.findById(itemNo)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 게시글 번호입니다."));
 
+        if (!userInfo.getUserNick().equals(marketItem.getSeller())) {
+            throw new RuntimeException("권한이 없습니다.");
+        }
+
+        try {
+            marketItemRepository.deleteById(itemNo);
+        } catch (Exception e) {
+            log.error("존재하지 않는 게시글 번호로 삭제가 실패했습니다. - itemNo : {}, err : {}", itemNo, e.getMessage());
+            throw new RuntimeException("게시글이 존재하지 않아 삭제에 실패했습니다.");
+        }
     }
 
     // 판매 완료 처리

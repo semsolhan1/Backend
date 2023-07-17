@@ -34,7 +34,7 @@ public class MarketController {
 
     // 판매 게시글 등록
     @PostMapping
-    public ResponseEntity<?> resistItem(
+    public ResponseEntity<?> registItem(
             @AuthenticationPrincipal TokenUserInfo userInfo,
             @RequestPart("marketItem") MarketItemCreateRequestDTO requestDTO,
             @RequestPart(value = "itemImgs", required = false) List<MultipartFile> itemImgs) {
@@ -52,19 +52,25 @@ public class MarketController {
     @GetMapping("/{itemNo}")
     public ResponseEntity<?> getItem(@PathVariable long itemNo) {
         log.info("{}번 판매 게시글 조회 요청!", itemNo);
-        return ResponseEntity.ok().body("서버에서 " + itemNo + "번 판매글 조회 요청 받음.");
+        MarketItemResponseDTO item = marketService.getItem(itemNo);
+        return ResponseEntity.ok().body(item);
     }
 
     // 판매 게시글 수정
     @PatchMapping
-    public ResponseEntity<?> modify(@RequestBody MarketItemModifyRequestDTO requestDTO) {
+    public ResponseEntity<?> modify(
+            @AuthenticationPrincipal TokenUserInfo userInfo,
+            @RequestBody MarketItemModifyRequestDTO requestDTO
+            ) {
         log.info("{}번 판매 게시글 수정 요청!", requestDTO.getItemNo());
         return ResponseEntity.ok().body("서버에서 " + requestDTO.getItemNo() + "번 판매글 수정 요청 받음.");
     }
 
     // 판매 게시글 삭제
     @DeleteMapping("/{itemNo}")
-    public ResponseEntity<?> delete(@PathVariable long itemNo) {
+    public ResponseEntity<?> delete(
+            @AuthenticationPrincipal TokenUserInfo userInfo,
+            @PathVariable long itemNo) {
         log.info("{}번 판매 게시글 삭제 요청!", itemNo);
         return ResponseEntity.ok().body("서버에서 " + itemNo + "번 판매글 삭제 요청 받음");
     }
