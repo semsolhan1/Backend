@@ -10,7 +10,6 @@ import com.handifarm.cboard.entity.Cboard;
 import com.handifarm.cboard.entity.HashTag;
 import com.handifarm.cboard.repository.CboardRepository;
 import com.handifarm.cboard.repository.HashTagRepository;
-import com.handifarm.recontent.dto.page.RecontentPageDTO;
 import com.handifarm.recontent.dto.response.RecontentDetailResponseDTO;
 import com.handifarm.recontent.entity.Recontent;
 import com.handifarm.recontent.repository.RecontentRepository;
@@ -70,7 +69,7 @@ public class CboardService {
         List<CboardDetailResponseDTO> dtoList = cboardList.stream()
                 .map(board -> {
                     String recontentId = board.getCboardId();
-                    List<Recontent> recontentList = (List<Recontent>) recontentService.contentretrieve(recontentId ,new RecontentPageDTO());
+                    Page<Recontent> recontentList = recontentRepository.findByCboard_CboardId(recontentId,Pageable.unpaged());
                     List<RecontentDetailResponseDTO> recontentDTOList = recontentList.stream()
                             .map(content -> new RecontentDetailResponseDTO(content))
                             .collect(Collectors.toList());
@@ -93,8 +92,6 @@ public class CboardService {
 
         List<String> hashTags = dto.getHashTags();
 
-        List<Recontent> recontents = dto.getRecontents();
-
         Cboard saved = cboardRepository.save(cboard);
 
         if(hashTags != null && hashTags.size() > 0){
@@ -104,18 +101,6 @@ public class CboardService {
                             .hashName(hashtag)
                             .cboard(saved)
                             .build()
-                );
-                saved.addHashTag(savedTag);
-            });
-        }
-
-        if(hashTags != null && hashTags.size() > 0){
-            hashTags.forEach(hashtag -> {
-                HashTag savedTag = hashTagRepository.save(
-                        HashTag.builder()
-                                .hashName(hashtag)
-                                .cboard(saved)
-                                .build()
                 );
                 saved.addHashTag(savedTag);
             });
@@ -202,6 +187,9 @@ public class CboardService {
         if(!(dto.getTitle() == null)){
         cboardEntity.setTitle(dto.getTitle());
         }
+        if(!(dto.getWriter() == null)){
+            cboardEntity.setWriter(dto.getWriter());
+        }
         if(!(dto.getContent() == null)){
         cboardEntity.setContent(dto.getContent());
         }
@@ -248,7 +236,14 @@ public class CboardService {
 
         List<Cboard> cboardList = pageData.getContent();
         List<CboardDetailResponseDTO> dtoList = cboardList.stream()
-                .map(board -> new CboardDetailResponseDTO(board))
+                .map(board -> {
+                    Page<Recontent> recontentPage = recontentRepository.findByCboard_CboardId(board.getCboardId(),Pageable.unpaged());
+                    List<Recontent> recontentList = recontentPage.getContent();
+                    List<RecontentDetailResponseDTO> recontentDTOList = recontentList.stream()
+                            .map(content -> new RecontentDetailResponseDTO(content))
+                            .collect(Collectors.toList());
+                    return new CboardDetailResponseDTO(board, recontentDTOList);
+                })
                 .collect(Collectors.toList());
 
         // 페이지 정보 동적 갱신

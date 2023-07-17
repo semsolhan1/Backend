@@ -34,9 +34,10 @@ public class RecontentController {
     }
 
     //댓글 등록 요청
-    @PostMapping
+    @PostMapping("/{cboardid}")
     public ResponseEntity<?> createRecontent(
             @Validated @RequestBody RecontentCreateRequestDTO dto,
+            @PathVariable("cboardid") String CboardId,
             BindingResult result,
             RecontentPageDTO page
     ){
@@ -55,7 +56,7 @@ public class RecontentController {
 
         try {
 
-            RecontentListResponseDTO recontentListResponseDTO = recontentService.create(dto,page);
+            RecontentListResponseDTO recontentListResponseDTO = recontentService.create(CboardId,dto,page);
             return ResponseEntity.ok().body(recontentListResponseDTO);
         } catch (IllegalStateException e){
             log.warn(e.getMessage());

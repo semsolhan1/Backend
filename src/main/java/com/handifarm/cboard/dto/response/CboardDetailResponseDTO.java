@@ -6,6 +6,7 @@ import com.handifarm.recontent.dto.response.RecontentDetailResponseDTO;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,7 +52,9 @@ public class CboardDetailResponseDTO {
                 .stream()
                 .map(HashTag::getHashName)
                 .collect(Collectors.toList());
-        this.recontentDTOList = recontentDTOList;
+        this.recontentDTOList = recontentDTOList.stream()
+                .sorted(Comparator.comparing(RecontentDetailResponseDTO::getRecontentTime).reversed())
+                .collect(Collectors.toList());
     }
 
 }

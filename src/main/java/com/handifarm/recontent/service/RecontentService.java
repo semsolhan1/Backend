@@ -1,5 +1,7 @@
 package com.handifarm.recontent.service;
 
+import com.handifarm.cboard.entity.Cboard;
+import com.handifarm.cboard.repository.CboardRepository;
 import com.handifarm.recontent.dto.page.RecontentPageDTO;
 import com.handifarm.recontent.dto.page.RecontentPageResponseDTO;
 import com.handifarm.recontent.dto.request.RecontentCreateRequestDTO;
@@ -29,26 +31,22 @@ public class RecontentService {
 
     private final RecontentRepository recontentRepository;
 
-    public RecontentListResponseDTO contentretrieve(String cboardId, RecontentPageDTO dto) {
+    private final CboardRepository cboardRepository;
 
+    public RecontentListResponseDTO contentretrieve(String cboardId, RecontentPageDTO dto) {
         Pageable pageable = PageRequest.of(
-                dto.getRepage()-1,
+                dto.getRepage() - 1,
                 dto.getResize(),
                 Sort.by("recontentTime").descending()
         );
 
-        Page<Recontent> entityList;
-        if (cboardId != null) {
-            entityList = recontentRepository.findByCboard_CboardId(cboardId, pageable);
-        } else {
-            throw new IllegalArgumentException("cboard cannot be null.");
-        }
-
+        Page<Recontent> entityList = recontentRepository.findByCboard_CboardId(cboardId, pageable);
         List<Recontent> recontentList = entityList.getContent();
 
         List<RecontentDetailResponseDTO> dtoList = recontentList.stream()
-                .map(reboard -> new RecontentDetailResponseDTO(reboard))
+                .map(recontent -> new RecontentDetailResponseDTO(recontent))
                 .collect(Collectors.toList());
+
         return RecontentListResponseDTO.builder()
                 .count(dtoList.size())
                 .pageInfo(new RecontentPageResponseDTO(entityList))
@@ -57,27 +55,24 @@ public class RecontentService {
     }
 
 
-    public RecontentListResponseDTO create(RecontentCreateRequestDTO dto, RecontentPageDTO pageDTO)
-            throws RuntimeException, IllegalStateException{
+    public RecontentListResponseDTO create(String cboardId, RecontentCreateRequestDTO dto, RecontentPageDTO pageDTO)
+            throws RuntimeException, IllegalStateException {
+        Cboard cboard = cboardRepository.findById(cboardId).orElseThrow();
 
+        Recontent recontentEntity = dto.toEntity(cboard);
+        recontentRepository.save(recontentEntity);
+
+        // 댓글 목록을 조회
         Pageable pageable = PageRequest.of(
-                pageDTO.getRepage()-1,
+                pageDTO.getRepage() - 1,
                 pageDTO.getResize(),
                 Sort.by("recontentTime").descending()
         );
-
-        Page<Recontent> entityList = recontentRepository.findAll(pageable);
-
-
-        Recontent recontentEntity = dto.toEntity();
-        recontentRepository.save(recontentEntity);
-
-
-        // 댓글 생성 이후에 댓글 목록을 조회
-        List<Recontent> recontentList = (List<Recontent>) contentretrieve(recontentEntity.getCboard().getCboardId(), new RecontentPageDTO());
+        Page<Recontent> entityList = recontentRepository.findByCboard_CboardId(cboardId, pageable);
+        List<Recontent> recontentList = entityList.getContent();
 
         List<RecontentDetailResponseDTO> recontentDTOList = recontentList.stream()
-                .map(content -> new RecontentDetailResponseDTO(content))
+                .map(recontent -> new RecontentDetailResponseDTO(recontent))
                 .collect(Collectors.toList());
 
         return RecontentListResponseDTO.builder()

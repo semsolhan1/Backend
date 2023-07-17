@@ -1,5 +1,6 @@
 package com.handifarm.cboard.dto.request;
 
+import com.handifarm.recontent.dto.response.RecontentDetailResponseDTO;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
@@ -29,6 +30,8 @@ public class CboardModifyrequestDTO {
     private String fileUp;
 
     private LocalDateTime boardTime;
+
+    private List<RecontentDetailResponseDTO> recontentDTOList;
 
 //    public Cboard toModifyEntity(Cboard ModifyBoard,String uploadedFilePath){
 //        return Cboard.builder()

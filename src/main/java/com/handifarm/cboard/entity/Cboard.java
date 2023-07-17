@@ -46,7 +46,7 @@ public class Cboard {
     @Builder.Default
     private List<HashTag> hashTags = new ArrayList<>();
 
-    @OneToMany(mappedBy = "cboard", orphanRemoval = true)
+    @OneToMany(mappedBy = "cboard", orphanRemoval = false)
     @Builder.Default
     private List<Recontent> recontents = new ArrayList<>();
 
@@ -58,12 +58,7 @@ public class Cboard {
         }
     }
 
-    public void addRecontent(Recontent savedRecontent) {
-        recontents.add(savedRecontent);
-        if(this != savedRecontent.getCboard()){
-            savedRecontent.setCboard(this);
-        }
-    }
+
 
 
 }

@@ -1,5 +1,6 @@
 package com.handifarm.recontent.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.handifarm.cboard.dto.response.CboardDetailResponseDTO;
 import com.handifarm.recontent.entity.Recontent;
 import lombok.*;
@@ -19,6 +20,8 @@ public class RecontentDetailResponseDTO {
     private String writer;
     private String content;
     private LocalDateTime recontentTime;
+
+    @JsonIgnore
     private CboardDetailResponseDTO cboard;
 
     public RecontentDetailResponseDTO(Recontent recontent){
