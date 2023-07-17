@@ -28,3 +28,7 @@ logging.level:
 spring-doc:
   swagger-ui:
     path: /myapi.html
+
+logging:
+  level:
+    org.springframework: DEBUG
