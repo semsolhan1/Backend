@@ -11,6 +11,8 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import javax.annotation.PostConstruct;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 @Component
 @Slf4j
@@ -60,6 +62,28 @@ public class S3Service {
 
         // 업로드 된 파일의 url 을 반환
         return s3.utilities().getUrl(b -> b.bucket(bucketName).key(fileName)).toString();
+    }
+
+    public void deleteFromS3Bucket(String fileLink) {
+
+        // fileLink에서 버킷 이름과 파일 키를 추출
+        String bucketName;
+        String key;
+
+        try {
+            URI uri = new URI(fileLink);
+            bucketName = uri.getHost();
+            key = uri.getPath().startsWith("/") ? uri.getPath().substring(1) : uri.getPath();
+        } catch (URISyntaxException e) {
+            log.error("Invalid fileLink format: {}", fileLink);
+            return;
+        }
+
+        // 파일 삭제 요청 생성
+        s3.deleteObject(builder -> builder.bucket(bucketName).key(key));
+
+        log.info("File deleted successfully: {}", fileLink);
+
     }
 
 }

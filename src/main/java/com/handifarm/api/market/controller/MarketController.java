@@ -9,6 +9,7 @@ import com.handifarm.api.util.page.PageDTO;
 import com.handifarm.jwt.TokenUserInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +45,7 @@ public class MarketController {
             return ResponseEntity.ok().body(marketItemResponseDTO);
         } catch (Exception e) {
             log.error("판매 게시글 등록 중 오류 발생", e);
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body("판매 게시글 등록 중 오류 발생: " + e.getMessage());
         }
     }
 
@@ -57,13 +58,21 @@ public class MarketController {
     }
 
     // 판매 게시글 수정
-    @PatchMapping
+    @PatchMapping("/{itemNo}")
     public ResponseEntity<?> modify(
             @AuthenticationPrincipal TokenUserInfo userInfo,
-            @RequestBody MarketItemModifyRequestDTO requestDTO
-            ) {
-        log.info("{}번 판매 게시글 수정 요청!", requestDTO.getItemNo());
-        return ResponseEntity.ok().body("서버에서 " + requestDTO.getItemNo() + "번 판매글 수정 요청 받음.");
+            @PathVariable long itemNo,
+            @RequestPart("itemInfo") MarketItemModifyRequestDTO requestDTO,
+            @RequestPart(value = "itemImgs", required = false) List<MultipartFile> itemImgs
+    ) {
+        log.info("{}번 판매 게시글 수정 요청!", itemNo);
+        try {
+            MarketItemResponseDTO marketItemResponseDTO = marketService.modifyItem(userInfo, itemNo, requestDTO, itemImgs);
+            return ResponseEntity.ok().body(marketItemResponseDTO);
+        } catch (RuntimeException e) {
+            log.error("판매 게시글 수정 중 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("판매 게시글 수정 중 오류 발생: " + e.getMessage());
+        }
     }
 
     // 판매 게시글 삭제
@@ -72,14 +81,26 @@ public class MarketController {
             @AuthenticationPrincipal TokenUserInfo userInfo,
             @PathVariable long itemNo) {
         log.info("{}번 판매 게시글 삭제 요청!", itemNo);
-        return ResponseEntity.ok().body("서버에서 " + itemNo + "번 판매글 삭제 요청 받음");
+        try {
+            marketService.deleteItem(userInfo, itemNo);
+            return ResponseEntity.ok().body("판매 게시글 삭제 완료");
+        } catch (Exception e) {
+            log.error("판매 게시글 삭제 중 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("판매 게시글 삭제 중 오류 발생: " + e.getMessage());
+        }
     }
 
     // 판매 완료 처리
-    @PatchMapping("/{itemNo}")
+    @PatchMapping("/done/{itemNo}")
     public ResponseEntity<?> done(@PathVariable long itemNo) {
         log.info("{}번 판매 게시글 판매 완료 처리 요청!", itemNo);
-        return ResponseEntity.ok().body("서버에서 " + itemNo + "번 판매글 판매 완료 처리 요청 받음");
+        try {
+            MarketItemResponseDTO marketItemResponseDTO = marketService.doneItem(itemNo);
+            return ResponseEntity.ok().body(marketItemResponseDTO);
+        } catch (Exception e) {
+            log.error("판매 게시글 판매 완료 처리 중 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("판매 게시글 판매 완료 처리 중 오류 발생: " + e.getMessage());
+        }
     }
 
 }

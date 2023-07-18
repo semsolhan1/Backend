@@ -10,7 +10,6 @@ import java.util.List;
 @Builder
 public class MarketItemModifyRequestDTO {
 
-    private long itemNo;
     private String itemName;
     private String itemContent;
     private int price;
