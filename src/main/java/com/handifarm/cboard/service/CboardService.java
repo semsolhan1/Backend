@@ -69,7 +69,8 @@ public class CboardService {
         List<CboardDetailResponseDTO> dtoList = cboardList.stream()
                 .map(board -> {
                     String recontentId = board.getCboardId();
-                    Page<Recontent> recontentList = recontentRepository.findByCboard_CboardId(recontentId,Pageable.unpaged());
+                    Pageable recontentPageable = PageRequest.of(0, 10, Sort.by("recontentOrder").ascending());
+                    Page<Recontent> recontentList = recontentRepository.findByCboard_CboardId(recontentId,recontentPageable);
                     List<RecontentDetailResponseDTO> recontentDTOList = recontentList.stream()
                             .map(content -> new RecontentDetailResponseDTO(content))
                             .collect(Collectors.toList());
@@ -112,11 +113,17 @@ public class CboardService {
         return retrieve(pageDTO);
     }
 
-    public CboardListResponseDTO delete(String cboardid, int currentPage) throws NotFoundException {
+    public CboardListResponseDTO delete(CboardModifyrequestDTO dto, int currentPage) throws NotFoundException {
 
-        Cboard deletedCboard = cboardRepository.findById(cboardid)
-                .orElseThrow(() -> new NotFoundException("해당 id에 해당하는 데이터를 찾을 수 없습니다. - id: " + cboardid));
-        cboardRepository.deleteById(cboardid);
+        Cboard deletedCboard = cboardRepository.findById(dto.getId())
+                .orElseThrow(() -> new NotFoundException("해당 id에 해당하는 데이터를 찾을 수 없습니다. - id: " + dto.getId()));
+
+        // 작성자 검증
+        if (!deletedCboard.getWriter().equals(dto.getWriter())) {
+            throw new IllegalStateException("해당 게시물을 삭제할 권한이 없습니다.");
+        }
+
+        cboardRepository.deleteById(dto.getId());
 
         // 삭제된 게시물의 이전 게시물 조회
         Cboard previousCboard = cboardRepository.findFirstByBoardTimeLessThanOrderByBoardTimeDesc(deletedCboard.getBoardTime());
@@ -188,6 +195,9 @@ public class CboardService {
         cboardEntity.setTitle(dto.getTitle());
         }
         if(!(dto.getWriter() == null)){
+            if (!dto.getWriter().equals(cboardEntity.getWriter())) {
+                throw new IllegalStateException("작성자와 일치하지 않아 게시글을 수정할 수 없습니다.");
+            }
             cboardEntity.setWriter(dto.getWriter());
         }
         if(!(dto.getContent() == null)){

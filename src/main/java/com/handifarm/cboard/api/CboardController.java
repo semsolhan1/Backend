@@ -95,14 +95,19 @@ public class CboardController {
 
     //게시판 삭제 요청
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping
     public ResponseEntity<?> deleteCboard(
-            @PathVariable("id") String cboardid,
-            @RequestParam(required = false) Integer page
+            @Validated @RequestBody CboardModifyrequestDTO dto,
+            @RequestParam(required = false) Integer page,
+            BindingResult result
     ) {
-        log.info("/api/cboard/{} DELETE request", cboardid,page);
+//        log.info("/api/cboard/{} DELETE request", cboardid,page);
 
-        if (cboardid == null || cboardid.trim().equals("")) {
+        ResponseEntity<List<FieldError>> fielderrors = getValidated(result);
+
+        if(dto == null) return fielderrors;
+
+        if (dto.getId() == null || dto.getId().trim().equals("")) {
             return ResponseEntity.badRequest().body(CboardListResponseDTO.builder().error("id를 전달해 주세요."));
         }
 
@@ -111,7 +116,7 @@ public class CboardController {
 
 
         try {
-            CboardListResponseDTO cboardListResponseDTO = cboardService.delete(cboardid,pageNumber);
+            CboardListResponseDTO cboardListResponseDTO = cboardService.delete(dto,pageNumber);
             return ResponseEntity.ok().body(cboardListResponseDTO);
         } catch (NotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

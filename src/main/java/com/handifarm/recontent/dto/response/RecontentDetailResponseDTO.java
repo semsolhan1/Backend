@@ -16,21 +16,20 @@ import java.time.LocalDateTime;
 @Builder
 public class RecontentDetailResponseDTO {
 
-    private String id;
-    private String writer;
-    private String content;
+    private int recontentOrder;
+    private String rewriter;
+    private String recontent;
     private LocalDateTime recontentTime;
 
     @JsonIgnore
     private CboardDetailResponseDTO cboard;
 
     public RecontentDetailResponseDTO(Recontent recontent){
-        this.id = recontent.getRecontentId();
-        this.writer = recontent.getRewriter();
-        this.content = recontent.getRecontent();
+        this.recontentOrder = recontent.getRecontentOrder();
+        this.rewriter = recontent.getRewriter();
+        this.recontent = recontent.getRecontent();
         this.recontentTime = recontent.getRecontentTime();
         this.cboard = new CboardDetailResponseDTO(recontent.getCboard());
-
     }
 
 }

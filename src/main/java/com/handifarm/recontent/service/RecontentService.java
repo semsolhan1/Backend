@@ -5,6 +5,7 @@ import com.handifarm.cboard.repository.CboardRepository;
 import com.handifarm.recontent.dto.page.RecontentPageDTO;
 import com.handifarm.recontent.dto.page.RecontentPageResponseDTO;
 import com.handifarm.recontent.dto.request.RecontentCreateRequestDTO;
+import com.handifarm.recontent.dto.request.RecontentModifyRequestDTO;
 import com.handifarm.recontent.dto.response.RecontentDetailResponseDTO;
 import com.handifarm.recontent.dto.response.RecontentListResponseDTO;
 import com.handifarm.recontent.entity.Recontent;
@@ -37,7 +38,7 @@ public class RecontentService {
         Pageable pageable = PageRequest.of(
                 dto.getRepage() - 1,
                 dto.getResize(),
-                Sort.by("recontentTime").descending()
+                Sort.by("recontentOrder").ascending()
         );
 
         Page<Recontent> entityList = recontentRepository.findByCboard_CboardId(cboardId, pageable);
@@ -66,13 +67,76 @@ public class RecontentService {
         Pageable pageable = PageRequest.of(
                 pageDTO.getRepage() - 1,
                 pageDTO.getResize(),
-                Sort.by("recontentTime").descending()
+                Sort.by("recontentOrder").ascending()
         );
         Page<Recontent> entityList = recontentRepository.findByCboard_CboardId(cboardId, pageable);
         List<Recontent> recontentList = entityList.getContent();
 
         List<RecontentDetailResponseDTO> recontentDTOList = recontentList.stream()
                 .map(recontent -> new RecontentDetailResponseDTO(recontent))
+                .collect(Collectors.toList());
+
+        return RecontentListResponseDTO.builder()
+                .count(recontentDTOList.size())
+                .pageInfo(new RecontentPageResponseDTO(entityList))
+                .board(recontentDTOList)
+                .build();
+    }
+
+    public RecontentListResponseDTO delete(String cboardId, int recontentOrder, RecontentModifyRequestDTO dto, RecontentPageDTO page) {
+
+        Recontent recontent = recontentRepository.findByCboard_CboardIdAndRecontentOrder(cboardId, recontentOrder)
+                .orElseThrow(() -> new IllegalArgumentException("해당 댓글을 찾을 수 없습니다."));
+
+        if (!recontent.getCboard().getCboardId().equals(cboardId)) {
+            throw new IllegalStateException("해당 댓글을 삭제할 권한이 없습니다.");
+        }
+
+        if (!recontent.getRewriter().equals(dto.getRewriter())) {
+            throw new IllegalStateException("댓글 작성자와 일치하지 않아 삭제할 수 없습니다.");
+        }
+
+        recontentRepository.delete(recontent);
+
+        // 댓글 목록을 조회
+        Pageable pageable = PageRequest.of(page.getRepage() - 1, page.getResize(), Sort.by("recontentOrder").ascending());
+        Page<Recontent> entityList = recontentRepository.findByCboard_CboardId(cboardId, pageable);
+        List<Recontent> recontentList = entityList.getContent();
+
+        List<RecontentDetailResponseDTO> recontentDTOList = recontentList.stream()
+                .map(recontents -> new RecontentDetailResponseDTO(recontents))
+                .collect(Collectors.toList());
+
+        return RecontentListResponseDTO.builder()
+                .count(recontentDTOList.size())
+                .pageInfo(new RecontentPageResponseDTO(entityList))
+                .board(recontentDTOList)
+                .build();
+    }
+
+    public RecontentListResponseDTO update(String cboardId, int recontentOrder, RecontentModifyRequestDTO dto, RecontentPageDTO page) {
+        Recontent recontent = recontentRepository.findByCboard_CboardIdAndRecontentOrder(cboardId, recontentOrder)
+                .orElseThrow(() -> new IllegalArgumentException("해당 댓글을 찾을 수 없습니다."));
+
+        if (!recontent.getCboard().getCboardId().equals(cboardId)) {
+            throw new IllegalStateException("해당 댓글을 수정할 권한이 없습니다.");
+        }
+
+        if (!recontent.getRewriter().equals(dto.getRewriter())) {
+            throw new IllegalStateException("댓글 작성자와 일치하지 않아 수정할 수 없습니다.");
+        }
+
+        recontent.setRecontent(dto.getRecontent());
+
+        Recontent modifiedRecontent = recontentRepository.save(recontent);
+
+        // 댓글 목록을 조회
+        Pageable pageable = PageRequest.of(page.getRepage() - 1, page.getResize(), Sort.by("recontentOrder").ascending());
+        Page<Recontent> entityList = recontentRepository.findByCboard_CboardId(cboardId, pageable);
+        List<Recontent> recontentList = entityList.getContent();
+
+        List<RecontentDetailResponseDTO> recontentDTOList = recontentList.stream()
+                .map(recontents -> new RecontentDetailResponseDTO(recontents))
                 .collect(Collectors.toList());
 
         return RecontentListResponseDTO.builder()

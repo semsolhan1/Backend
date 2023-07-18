@@ -4,7 +4,6 @@ package com.handifarm.recontent.entity;
 import com.handifarm.cboard.entity.Cboard;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -12,7 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString(exclude = {"cboard"})
-@EqualsAndHashCode(of = "recontentId")
+@EqualsAndHashCode(of = "recontentOrder")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -21,9 +20,8 @@ import java.time.LocalDateTime;
 public class Recontent {
 
     @Id
-    @GeneratedValue(generator = "recontent_uuid")
-    @GenericGenerator(name = "recontent_uuid", strategy = "uuid")
-    private String recontentId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int recontentOrder;
 
     @Column(nullable = false)
     private String recontent;
@@ -33,6 +31,7 @@ public class Recontent {
 
     @CreationTimestamp
     private LocalDateTime recontentTime;
+
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "cboard_id")

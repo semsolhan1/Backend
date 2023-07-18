@@ -53,7 +53,7 @@ public class CboardDetailResponseDTO {
                 .map(HashTag::getHashName)
                 .collect(Collectors.toList());
         this.recontentDTOList = recontentDTOList.stream()
-                .sorted(Comparator.comparing(RecontentDetailResponseDTO::getRecontentTime).reversed())
+                .sorted(Comparator.comparing(RecontentDetailResponseDTO::getRecontentOrder))
                 .collect(Collectors.toList());
     }
 

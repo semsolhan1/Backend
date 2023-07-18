@@ -3,6 +3,7 @@ package com.handifarm.recontent.api;
 
 import com.handifarm.recontent.dto.page.RecontentPageDTO;
 import com.handifarm.recontent.dto.request.RecontentCreateRequestDTO;
+import com.handifarm.recontent.dto.request.RecontentModifyRequestDTO;
 import com.handifarm.recontent.dto.response.RecontentListResponseDTO;
 import com.handifarm.recontent.service.RecontentService;
 import lombok.RequiredArgsConstructor;
@@ -86,5 +87,78 @@ public class RecontentController {
 
     }
 
+    // 댓글 삭제
+    @DeleteMapping("/{cboardid}/{recontentOrder}")
+    public ResponseEntity<?> deleteRecontent(
+            @Validated @RequestBody RecontentModifyRequestDTO dto,
+            @PathVariable("cboardid") String cboardId,
+            @PathVariable("recontentOrder") int recontentOrder,
+            BindingResult result,
+            RecontentPageDTO page
+    ) {
+
+        if (dto == null) {
+            return ResponseEntity.badRequest().body("댓글 수정 내용을 전달해 주세요.");
+        }
+
+        ResponseEntity<List<FieldError>> fieldErrors = getValidated(result);
+
+        if (fieldErrors != null) {
+            return fieldErrors;
+        }
+
+        try {
+            recontentService.delete(cboardId, recontentOrder, dto, page);
+            return ResponseEntity.ok().body("댓글이 삭제되었습니다.");
+        } catch (IllegalStateException e) {
+            log.warn(e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("서버 오류 발생: " + e.getMessage());
+        } catch (Exception e) {
+            log.warn(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // 댓글 수정
+    @PutMapping("/{cboardid}/{recontentOrder}")
+    public ResponseEntity<?> updateRecontent(
+            @Validated @RequestBody RecontentModifyRequestDTO dto,
+            @PathVariable("cboardid") String cboardId,
+            @PathVariable("recontentOrder") int recontentOrder,
+            BindingResult result,
+            RecontentPageDTO page
+    ) {
+        log.info("/api/recontent/put - {}", dto);
+
+        if (dto == null) {
+            return ResponseEntity.badRequest().body("댓글 수정 내용을 전달해 주세요.");
+        }
+
+        ResponseEntity<List<FieldError>> fieldErrors = getValidated(result);
+
+        if (fieldErrors != null) {
+            return fieldErrors;
+        }
+
+        try {
+            RecontentListResponseDTO recontentListResponseDTO = recontentService.update(cboardId, recontentOrder, dto, page);
+            return ResponseEntity.ok().body(recontentListResponseDTO);
+        } catch (IllegalStateException e) {
+            log.warn(e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("서버 오류 발생: " + e.getMessage());
+        } catch (Exception e) {
+            log.warn(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 
 }
+
+
