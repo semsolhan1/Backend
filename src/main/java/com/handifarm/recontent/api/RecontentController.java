@@ -26,8 +26,10 @@ public class RecontentController {
     private final RecontentService recontentService;
 
     //댓글 목록
-    @GetMapping
-    public ResponseEntity<?> retrieveList(String cboardId , RecontentPageDTO pageDTO){
+    @GetMapping("/{cboardid}")
+    public ResponseEntity<?> retrieveList(
+            @PathVariable("cboardid") String cboardId,
+            RecontentPageDTO pageDTO){
 
         RecontentListResponseDTO dto = recontentService.contentretrieve(cboardId , pageDTO);
 
