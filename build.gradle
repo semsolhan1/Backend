@@ -40,7 +40,7 @@ dependencies {
 	implementation 'org.springdoc:springdoc-openapi-ui:1.6.9'
 
 	// 스프링 시큐리티 모듈
-//	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 
 	// json web token 라이브러리
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
@@ -49,6 +49,12 @@ dependencies {
 
 	// 파일 업로드 라이브러리
 	implementation 'commons-io:commons-io:2.8.0'
+
+	// S3 라이브러리
+	implementation 'software.amazon.awssdk:s3:2.17.52'
+
+	// 문자 전송 API (coolsms)
+	implementation 'net.nurigo:sdk:4.2.7'
 
 }
 
