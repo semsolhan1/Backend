@@ -45,9 +45,9 @@ public class Board {
         FREE,
         INFORMATION
     };
+  
     public void increaseViews() {
         this.views++;
     }
-
 
 };
