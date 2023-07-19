@@ -6,11 +6,11 @@ HandyFarm Backend Git Repository.
 1. MySQL Workbench -> root 계정으로 접속.
 2. 디스코드 DB 및 Key 채널에 sql 문 실행.
 3. 워크벤치 홈에서 새로운 커넥션 생성.
-   1. Connection Name : HandiFarm (변경 가능)
-   2. Username : handi
-   3. password -> Store in Valut... -> farm -> OK
-   4. Default Schema : handifarm
-   5. Test connection -> 연결 정상적인지 확인 후 OK -> OK
+    1. Connection Name : HandiFarm (변경 가능)
+    2. Username : handi
+    3. password -> Store in Valut... -> farm -> OK
+    4. Default Schema : handifarm
+    5. Test connection -> 연결 정상적인지 확인 후 OK -> OK
 4. 생성된 커넥션(Connection Name에서 설정한 이름)으로 접속.
 5. 각 테이블 생성문 실행.
 

@@ -1,6 +1,5 @@
 package com.handifarm.api.board.service;
 
-import antlr.Token;
 import com.handifarm.api.board.dto.request.BoardModifyRequestDTO;
 import com.handifarm.api.board.dto.request.BoardWriteRequestDTO;
 import com.handifarm.api.board.dto.response.BoardListResponseDTO;
