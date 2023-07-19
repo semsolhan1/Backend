@@ -26,10 +26,10 @@ class BoardRepositoryTest {
     void registTest() {
         //given
         for (int i = 1; i <= 100; i++) {
-            String category = "INFORMATION";
-            String title = "정보 " + i;
-            String content = "정보내용 " + i;
-            String userNick = "곰돌";
+            String category = "FREE";
+            String title = "자유" + i;
+            String content = "자유내용 " + i;
+            String userNick = "곰돌곰돌";
 
             BoardWriteRequestDTO requestDTO = new BoardWriteRequestDTO();
             requestDTO.setCategory(category);
