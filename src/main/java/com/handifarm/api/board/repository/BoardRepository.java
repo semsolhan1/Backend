@@ -13,8 +13,6 @@ import java.util.List;
 @Repository
 public interface BoardRepository extends JpaRepository<Board, Long> {
 
-
-
     // 게시글 개수 리턴
     @Query("SELECT COUNT(*) FROM Board")
     int countBoard();
@@ -28,12 +26,4 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     @Query("DELETE FROM Board b WHERE b.boardNo = :boardNo")
     void deleteBoard(Long boardNo);
 
-
-
-
-
-
-
 }
-
-
