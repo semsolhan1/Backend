@@ -1,5 +1,6 @@
 package com.handifarm.api.board.entity;
 
+import com.handifarm.api.user.entity.User;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -44,9 +45,9 @@ public class Board {
         FREE,
         INFORMATION
     };
+  
     public void increaseViews() {
         this.views++;
     }
-
 
 };

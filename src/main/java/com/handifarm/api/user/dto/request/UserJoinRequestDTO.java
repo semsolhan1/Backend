@@ -3,6 +3,7 @@ package com.handifarm.api.user.dto.request;
 import com.handifarm.api.user.entity.User;
 import lombok.*;
 
+import javax.persistence.Id;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;

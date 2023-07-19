@@ -1,6 +1,7 @@
 package com.handifarm.api.board.dto.request;
 
 import com.handifarm.api.board.entity.Board;
+import com.handifarm.api.user.entity.User;
 import com.handifarm.jwt.TokenUserInfo;
 import lombok.*;
 
@@ -45,5 +46,3 @@ public class BoardWriteRequestDTO {
     }
 
 }
-
-

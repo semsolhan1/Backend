@@ -1,13 +1,13 @@
 package com.handifarm.api.user.entity;
 
+import com.handifarm.api.board.entity.Board;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Setter @Getter
 @ToString @EqualsAndHashCode()

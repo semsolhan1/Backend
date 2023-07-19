@@ -15,5 +15,5 @@ HandyFarm Backend Git Repository.
 5. 각 테이블 생성문 실행.
 
 # Key
-- DB 및 Key 채널에서 keys.yml 파일 다운 후 classpath:/ 경로(src/main/resources)에 넣기.
-- API 사용 시 쓰이는 키 값들은 해당 파일에 입력 후 최신화해서 조원들과 공유해주세요. gitignore에 등록되어 있습니다.
+ - DB 및 Key 채널에서 keys.yml 파일 다운 후 classpath:/ 경로(src/main/resources)에 넣기.
+ - API 사용 시 쓰이는 키 값들은 해당 파일에 입력 후 최신화해서 조원들과 공유해주세요. gitignore에 등록되어 있습니다.

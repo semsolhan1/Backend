@@ -5,6 +5,7 @@ import com.handifarm.api.board.dto.request.BoardWriteRequestDTO;
 import com.handifarm.api.board.dto.response.BoardDetailResponseDTO;
 import com.handifarm.api.board.dto.response.BoardListResponseDTO;
 import com.handifarm.api.board.service.BoardService;
+import com.handifarm.api.user.entity.User;
 import com.handifarm.api.util.page.PageDTO;
 import com.handifarm.jwt.TokenUserInfo;
 import lombok.RequiredArgsConstructor;
@@ -68,11 +69,5 @@ public class BoardController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }
-
-
-
-
-
-
 
 }
