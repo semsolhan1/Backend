@@ -23,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/cboard")
 public class CboardController {
-
+//
     private  final CboardService cboardService;
 
     //게시판 목록
