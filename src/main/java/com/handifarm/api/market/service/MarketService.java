@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -109,32 +110,40 @@ public class MarketService implements IMarketService {
         List<String> newImgLinks = requestDTO.getImgLinks();
 
         // 삭제된 이미지를 찾아 S3 버킷과 데이터베이스에서 삭제합니다.
+        List<ItemImg> removedItemImgs = new ArrayList<>();
         for (ItemImg existingItemImg : existingItemImgs) {
             if (!newImgLinks.contains(existingItemImg.getImgLink())) {
                 // S3 버킷에서 이미지 삭제
                 s3Service.deleteFromS3Bucket(existingItemImg.getImgLink());
                 // 데이터베이스에서 이미지 삭제
                 itemImgRepository.delete(existingItemImg);
+                // 동기화를 위해 삭제된 파일 목록 추가
+                removedItemImgs.add(existingItemImg);
             }
         }
+
+        // marketItem의 itemImgs에서 삭제된 이미지를 제거합니다.
+        marketItem.getItemImgs().removeAll(removedItemImgs);
 
         // 새로운 이미지를 데이터베이스와 S3 버킷에 추가합니다.
         addImgsToDBAndS3(itemImgs, marketItem);
 
         // 수정된 MarketItem을 데이터베이스에 저장합니다.
-        marketItemRepository.save(marketItem);
+        MarketItem savedMarketItem = marketItemRepository.save(marketItem);
 
-        return new MarketItemResponseDTO(marketItem);
+        return new MarketItemResponseDTO(savedMarketItem);
     }
 
     // 이미지 List DB와 S3 버킷에 추가하는 메서드
     private void addImgsToDBAndS3(List<MultipartFile> itemImgs, MarketItem marketItem) {
+        String serviceName = "MARKET";
+
         if (itemImgs != null && !itemImgs.isEmpty()) {
             List<String> uploadUrls = itemImgs.stream()
                     .map(itemImg -> {
                         try {
                             String uuidFileName = UUID.randomUUID() + "_" + itemImg.getOriginalFilename();
-                            String uploadUrl = s3Service.uploadToS3Bucket(itemImg.getBytes(), uuidFileName);
+                            String uploadUrl = s3Service.uploadToS3Bucket(itemImg.getBytes(), uuidFileName, serviceName);
                             return uploadUrl;
                         } catch (IOException e) {
                             log.error("이미지 업로드에 실패하였습니다.", e);

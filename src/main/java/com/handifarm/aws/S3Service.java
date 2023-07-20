@@ -29,8 +29,14 @@ public class S3Service {
     @Value("${aws.region}")
     private String region;
 
-    @Value("${aws.bucketName}")
-    private String bucketName;
+    @Value("${aws.bucketNames.profileBucket}")
+    private String profileBucketName;
+
+    @Value("${aws.bucketNames.marketBucket}")
+    private String marketBucketName;
+
+    @Value("${aws.bucketNames.snsBucket}")
+    private String snsBucketName;
 
     @PostConstruct
     private void initializeAmazon() {
@@ -49,7 +55,9 @@ public class S3Service {
      * @param fileName - 업로드 할 파일명
      * @return - 버킷에 업로드 된 버킷 경로 (url)
      */
-    public String uploadToS3Bucket(byte[] uploadFile, String fileName) {
+    public String uploadToS3Bucket(byte[] uploadFile, String fileName, String serviceName) {
+        // serviceName에 따라 다른 버킷 이름 선택
+        String bucketName = getBucketName(serviceName);
 
         // 업로드 할 파일을 S3 객체로 생성
         PutObjectRequest request = PutObjectRequest.builder()
@@ -65,25 +73,61 @@ public class S3Service {
     }
 
     public void deleteFromS3Bucket(String fileLink) {
-
         // fileLink에서 버킷 이름과 파일 키를 추출
-        String bucketName;
-        String key;
+        String bucketName = getBucketNameFromLink(fileLink);
+        String key = getKeyFromLink(fileLink);
 
-        try {
-            URI uri = new URI(fileLink);
-            bucketName = uri.getHost();
-            key = uri.getPath().startsWith("/") ? uri.getPath().substring(1) : uri.getPath();
-        } catch (URISyntaxException e) {
-            log.error("Invalid fileLink format: {}", fileLink);
-            return;
-        }
+        log.info("bucketName : {}, key : {}", bucketName, key);
 
         // 파일 삭제 요청 생성
         s3.deleteObject(builder -> builder.bucket(bucketName).key(key));
 
         log.info("File deleted successfully: {}", fileLink);
+    }
 
+    // serviceName에 따라 다른 버킷 이름 반환
+    private String getBucketName(String serviceName) {
+        switch (serviceName.toUpperCase()) {
+            case "USER":
+                return profileBucketName;
+            case "MARKET":
+                return marketBucketName;
+            case "SNS":
+                return snsBucketName;
+            default:
+                throw new RuntimeException("올바르지 않은 serviceName : " + serviceName);
+        }
+    }
+
+    // fileLink에서 버킷 이름 추출
+    private String getBucketNameFromLink(String fileLink) {
+        try {
+            URI uri = new URI(fileLink);
+            String scheme = uri.getScheme();
+            if (!"https".equalsIgnoreCase(scheme)) {
+                throw new RuntimeException("Invalid fileLink scheme: " + scheme);
+            }
+
+            String host = uri.getHost();
+            int endIndex = host.indexOf(".s3.ap-northeast-2.amazonaws.com");
+            if (endIndex == -1) {
+                throw new RuntimeException("Invalid fileLink format: " + fileLink);
+            }
+            return host.substring(0, endIndex);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Invalid fileLink format: " + fileLink);
+        }
+    }
+
+    // fileLink에서 파일 키 추출
+    private String getKeyFromLink(String fileLink) {
+        try {
+            URI uri = new URI(fileLink);
+            return uri.getPath().startsWith("/") ? uri.getPath().substring(1) : uri.getPath();
+        } catch (URISyntaxException e) {
+            log.error("Invalid fileLink format: {}", fileLink);
+            throw new RuntimeException("Invalid fileLink format");
+        }
     }
 
 }
