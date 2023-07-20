@@ -19,10 +19,6 @@ import java.util.List;
 public class CboardCreateRequestDTO {
 
     @NotBlank
-    @Size(min = 2, max = 20)
-    private String title;
-
-    @NotBlank
     private String writer;
 
     @NotBlank
@@ -30,16 +26,16 @@ public class CboardCreateRequestDTO {
 
     private List<String> hashTags;
 
+    private List<String> itemImgs;
+
     private List<Recontent> recontents;
 
     private LocalDateTime boardTime;
 
-    public Cboard toEntity(String uploadedFilePath){
+    public Cboard toEntity(){
         return Cboard.builder()
-                .title(this.title)
                 .writer(this.writer)
                 .content(this.content)
-                .fileUp(uploadedFilePath)
                 .boardTime(this.boardTime)
                 .build();
     }

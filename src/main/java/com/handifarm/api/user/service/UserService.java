@@ -130,16 +130,19 @@ public class UserService implements IUserService {
     // 프로필 이미지 등록
     @Override
     public String uploadUserProfileImg(TokenUserInfo userInfo, MultipartFile profileImg) throws Exception {
+        String serviceName = "USER";
 
         if (profileImg == null) {
             throw new RuntimeException("프로필 사진이 업로드되지 않았습니다.");
         }
 
+        String USER = "USER";
+
         User user = userRepository.findById(userInfo.getUserId()).orElseThrow(() -> new RuntimeException("회원 조회 실패."));
 
         String uuidFileName = UUID.randomUUID() + "_" + profileImg.getOriginalFilename();
 
-        String uploadUrl = s3Service.uploadToS3Bucket(profileImg.getBytes(), uuidFileName);
+        String uploadUrl = s3Service.uploadToS3Bucket(profileImg.getBytes(), uuidFileName, serviceName);
 
         user.setUserProfileImg(uploadUrl);
 
