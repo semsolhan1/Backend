@@ -1,13 +1,18 @@
 package com.handifarm.cboard.service;
 
+import com.handifarm.api.market.entity.ItemImg;
+import com.handifarm.api.market.entity.MarketItem;
+import com.handifarm.aws.S3Service;
 import com.handifarm.cboard.dto.page.PageDTO;
 import com.handifarm.cboard.dto.page.PageResponseDTO;
 import com.handifarm.cboard.dto.request.CboardCreateRequestDTO;
 import com.handifarm.cboard.dto.request.CboardModifyrequestDTO;
 import com.handifarm.cboard.dto.response.CboardDetailResponseDTO;
 import com.handifarm.cboard.dto.response.CboardListResponseDTO;
+import com.handifarm.cboard.entity.BoardImg;
 import com.handifarm.cboard.entity.Cboard;
 import com.handifarm.cboard.entity.HashTag;
+import com.handifarm.cboard.repository.BoardImgRepository;
 import com.handifarm.cboard.repository.CboardRepository;
 import com.handifarm.cboard.repository.HashTagRepository;
 import com.handifarm.recontent.dto.response.RecontentDetailResponseDTO;
@@ -29,6 +34,7 @@ import org.webjars.NotFoundException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -45,11 +51,12 @@ public class CboardService {
 
     private final RecontentRepository recontentRepository;
 
+    private final BoardImgRepository boardImgRepository;
+
+    private final S3Service s3Service;
+
     @Autowired
     private final RecontentService recontentService;
-
-    @Value("${upload.path}")
-    private String uploadRootPath;
 
 
     public CboardListResponseDTO retrieve(PageDTO dto) {
@@ -85,11 +92,11 @@ public class CboardService {
     }
 
 
-    public CboardListResponseDTO create(CboardCreateRequestDTO dto, final String uploadedFilePath)
+    public CboardListResponseDTO create(CboardCreateRequestDTO dto, List<MultipartFile> itemImgs)
             throws RuntimeException, IllegalStateException{
 
 
-        Cboard cboard = dto.toEntity(uploadedFilePath);
+        Cboard cboard = dto.toEntity();
 
         List<String> hashTags = dto.getHashTags();
 
@@ -106,7 +113,28 @@ public class CboardService {
                 saved.addHashTag(savedTag);
             });
         }
-
+        String SNS = "SNS";
+        if(itemImgs != null && !itemImgs.isEmpty()) {
+            List<String> uploadUrls = itemImgs.stream()
+                    .map(itemImg -> {
+                        try {
+                            String uuidFileName = UUID.randomUUID() + "_" + itemImg.getOriginalFilename();
+                            String uploadUrl = s3Service.uploadToS3Bucket(itemImg.getBytes(), uuidFileName, SNS);
+                            return uploadUrl;
+                        } catch (IOException e) {
+                            throw new RuntimeException("이미지 업로드에 실패하였습니다.", e);
+                        }
+                    })
+                    .collect(Collectors.toList());
+            uploadUrls.forEach(url -> {
+                BoardImg savedItemImg = boardImgRepository.save(
+                        BoardImg.builder()
+                                .imgLink(url)
+                                .cboard(saved)
+                                .build());
+                saved.addItemImg(savedItemImg);
+            });
+        }
 
         PageDTO pageDTO = new PageDTO();
 
@@ -123,7 +151,27 @@ public class CboardService {
             throw new IllegalStateException("해당 게시물을 삭제할 권한이 없습니다.");
         }
 
-        cboardRepository.deleteById(dto.getId());
+        // MarketItem에 연결된 이미지들을 가져와서 삭제합니다.
+        List<BoardImg> itemImgs = deletedCboard.getItemImgs();
+        for (BoardImg itemImg : itemImgs) {
+            try {
+                // S3 버킷에서 이미지 삭제
+                s3Service.deleteFromS3Bucket(itemImg.getImgLink());
+                // 데이터베이스에서 이미지 삭제
+                boardImgRepository.delete(itemImg);
+            } catch (Exception e) {
+                log.error("이미지 삭제 실패 - itemImg: {}, err: {}", itemImg.getImgLink(), e.getMessage());
+                throw new RuntimeException("이미지 삭제 도중 예외가 발생했습니다.");
+            }
+        }
+
+        try {
+            cboardRepository.deleteById(dto.getId());
+        } catch (Exception e) {
+            log.error("존재하지 않는 게시글 번호로 삭제가 실패했습니다. - itemNo : {}, err : {}", dto.getId(), e.getMessage());
+            throw new RuntimeException("게시글이 존재하지 않아 삭제에 실패했습니다.");
+        }
+
 
         // 삭제된 게시물의 이전 게시물 조회
         Cboard previousCboard = cboardRepository.findFirstByBoardTimeLessThanOrderByBoardTimeDesc(deletedCboard.getBoardTime());
@@ -187,13 +235,10 @@ public class CboardService {
                 .build();
     }
 
-    public CboardListResponseDTO update(CboardModifyrequestDTO dto, int page ,final String uploadedFilePath) {
+    public CboardListResponseDTO update(CboardModifyrequestDTO dto, int page ,List<MultipartFile> itemImgs) {
 
         Cboard cboardEntity = getCboard(dto.getId());
 
-        if(!(dto.getTitle() == null)){
-        cboardEntity.setTitle(dto.getTitle());
-        }
         if(!(dto.getWriter() == null)){
             if (!dto.getWriter().equals(cboardEntity.getWriter())) {
                 throw new IllegalStateException("작성자와 일치하지 않아 게시글을 수정할 수 없습니다.");
@@ -203,9 +248,29 @@ public class CboardService {
         if(!(dto.getContent() == null)){
         cboardEntity.setContent(dto.getContent());
         }
-        if(!(dto.getFileUp() == null)){
-        cboardEntity.setFileUp(uploadedFilePath);
+
+        // 이미지 링크를 처리합니다.
+        List<BoardImg> existingItemImgs = cboardEntity.getItemImgs();
+        List<String> newImgLinks = dto.getImgLinks();
+
+        // 삭제된 이미지를 찾아 S3 버킷과 데이터베이스에서 삭제합니다.
+        List<BoardImg> removedItemImgs = new ArrayList<>();
+        for (BoardImg existingItemImg : existingItemImgs) {
+            if (!newImgLinks.contains(existingItemImg.getImgLink())) {
+                // S3 버킷에서 이미지 삭제
+                s3Service.deleteFromS3Bucket(existingItemImg.getImgLink());
+                // 데이터베이스에서 이미지 삭제
+                boardImgRepository.delete(existingItemImg);
+                // 동기화를 위해 삭제된 파일 목록 추가
+                removedItemImgs.add(existingItemImg);
+            }
         }
+
+        // marketItem의 itemImgs에서 삭제된 이미지를 제거합니다.
+        cboardEntity.getItemImgs().removeAll(removedItemImgs);
+
+        // 새로운 이미지를 데이터베이스와 S3 버킷에 추가합니다.
+        addImgsToDBAndS3(itemImgs, cboardEntity);
 
         Cboard saved = cboardRepository.save(cboardEntity);
 
@@ -278,22 +343,37 @@ public class CboardService {
     }
 
 
+    public Cboard getBoardById(Cboard cboard) {
 
-    public String uploadProfileImage(MultipartFile profileImg) throws IOException  {
-
-        File rootDirectory = new File(uploadRootPath);
-        if(!rootDirectory.exists()){
-            rootDirectory.mkdir();
-        }
-
-        String FileName = UUID.randomUUID()
-                + "_" + profileImg.getOriginalFilename();
-
-        File uploadFile = new File(uploadRootPath + "/" + FileName);
-        profileImg.transferTo(uploadFile);
-
-        return  FileName;
-
+        return getCboard(cboard.getCboardId());
     }
 
+    // 이미지 List DB와 S3 버킷에 추가하는 메서드
+    private void addImgsToDBAndS3(List<MultipartFile> itemImgs, Cboard cboard) {
+        String serviceName = "SNS";
+
+        if (itemImgs != null && !itemImgs.isEmpty()) {
+            List<String> uploadUrls = itemImgs.stream()
+                    .map(itemImg -> {
+                        try {
+                            String uuidFileName = UUID.randomUUID() + "_" + itemImg.getOriginalFilename();
+                            String uploadUrl = s3Service.uploadToS3Bucket(itemImg.getBytes(), uuidFileName, serviceName);
+                            return uploadUrl;
+                        } catch (IOException e) {
+                            log.error("이미지 업로드에 실패하였습니다.", e);
+                            throw new RuntimeException("이미지 업로드에 실패하였습니다.");
+                        }
+                    })
+                    .collect(Collectors.toList());
+
+            // 데이터베이스와 MarketItem을 연결하며, 새로운 이미지들을 추가합니다.
+            uploadUrls.forEach(url -> {
+                BoardImg savedItemImg = boardImgRepository.save(BoardImg.builder()
+                        .imgLink(url)
+                        .cboard(cboard)
+                        .build());
+                cboard.addItemImg(savedItemImg);
+            });
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package com.handifarm.cboard.entity;
 
+import com.handifarm.api.market.entity.ItemImg;
 import com.handifarm.recontent.entity.Recontent;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -26,17 +27,12 @@ public class Cboard {
     @GenericGenerator(name = "cboard_uuid", strategy = "uuid")
     private String cboardId;
 
-    @Column(nullable = false)
-    private String title;
 
     @Column(nullable = false)
     private String content;
 
     @Column(nullable = false)
     private String writer;
-
-    private String fileUp;
-
 
 
     @CreationTimestamp
@@ -50,6 +46,10 @@ public class Cboard {
     @Builder.Default
     private List<Recontent> recontents = new ArrayList<>();
 
+    @OneToMany(mappedBy = "cboard", cascade = CascadeType.REMOVE)
+    @Builder.Default
+    private List<BoardImg> itemImgs = new ArrayList<>();
+
 
     public void addHashTag(HashTag savedTag) {
         hashTags.add(savedTag);
@@ -58,7 +58,10 @@ public class Cboard {
         }
     }
 
-
-
-
+    public void addItemImg(BoardImg itemImg) {
+        itemImgs.add(itemImg);
+        if(this != itemImg.getCboard()) {
+            itemImg.setCboard(this);
+        }
+    }
 }
