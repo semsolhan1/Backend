@@ -4,6 +4,7 @@ import com.handifarm.cboard.dto.page.PageDTO;
 import com.handifarm.cboard.dto.request.CboardCreateRequestDTO;
 import com.handifarm.cboard.dto.request.CboardModifyrequestDTO;
 import com.handifarm.cboard.dto.response.CboardListResponseDTO;
+import com.handifarm.cboard.entity.Cboard;
 import com.handifarm.cboard.service.CboardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,12 +36,29 @@ public class CboardController {
         return ResponseEntity.ok().body(dto);
     }
 
+    //게시판 개별 조회
+    @GetMapping("/{cboardId}")
+    public ResponseEntity<?> boardsearch(
+            @PathVariable("cboardId") Cboard cboardId
+            ){
+
+        log.info("get -{}", cboardId);
+
+        Cboard dto = cboardService.getBoardById(cboardId);
+
+        if(dto != null) {
+            return ResponseEntity.ok().body(dto);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 
     //게시판 등록 요청
     @PostMapping
     public ResponseEntity<?> createcboard(
-        @Validated @RequestBody CboardCreateRequestDTO dto,
-        @RequestPart(value = "profileImage", required = false) MultipartFile profileImg,
+        @Validated @RequestPart("create") CboardCreateRequestDTO dto,
+        @RequestPart(value = "itemImgs", required = false) List<MultipartFile> itemImgs,
             BindingResult result
     ){
             log.info("/api/cboard/post -{}",dto);
@@ -56,14 +74,8 @@ public class CboardController {
         }
 
         try {
-            String uploadedFilePath = null;
 
-            if(profileImg != null) {
-                log.info("attached file name: {}", profileImg.getOriginalFilename());
-                uploadedFilePath = cboardService.uploadProfileImage(profileImg);
-            }
-
-        CboardListResponseDTO cboardListResponseDTO = cboardService.create(dto,uploadedFilePath);
+        CboardListResponseDTO cboardListResponseDTO = cboardService.create(dto,itemImgs);
         return ResponseEntity.ok().body(cboardListResponseDTO);
         } catch (IllegalStateException e){
             log.warn(e.getMessage());
@@ -125,9 +137,8 @@ public class CboardController {
 
     @PutMapping
     public ResponseEntity<?> update(
-            @Validated @RequestBody CboardModifyrequestDTO dto,
-            @RequestParam(required = false) Integer page,
-            @RequestPart(value = "profileImage", required = false) MultipartFile profileImg,
+            @Validated @RequestPart("update") CboardModifyrequestDTO dto,
+            @RequestPart(value = "itemImgs", required = false) List<MultipartFile> itemImgs,
             BindingResult result
     ){
 
@@ -138,16 +149,11 @@ public class CboardController {
         if(dto == null) return fielderrors;
 
         try {
-            String uploadedFilePath = null;
 
-            if(profileImg != null) {
-                log.info("attached file name: {}", profileImg.getOriginalFilename());
-                uploadedFilePath = cboardService.uploadProfileImage(profileImg);
-            }
-
-            CboardListResponseDTO cboardListResponseDTO = cboardService.update(dto,page,uploadedFilePath);
+            CboardListResponseDTO cboardListResponseDTO = cboardService.update(dto,dto.getPage(),itemImgs);
             return ResponseEntity.ok().body(cboardListResponseDTO);
         } catch ( Exception e ) {
+            log.info("error : {}", e);
             return ResponseEntity.badRequest().body(e.getMessage());
         }
 

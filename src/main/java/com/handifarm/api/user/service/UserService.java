@@ -136,6 +136,8 @@ public class UserService implements IUserService {
             throw new RuntimeException("프로필 사진이 업로드되지 않았습니다.");
         }
 
+        String USER = "USER";
+
         User user = userRepository.findById(userInfo.getUserId()).orElseThrow(() -> new RuntimeException("회원 조회 실패."));
 
         String uuidFileName = UUID.randomUUID() + "_" + profileImg.getOriginalFilename();

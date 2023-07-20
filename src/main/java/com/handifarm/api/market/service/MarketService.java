@@ -74,6 +74,8 @@ public class MarketService implements IMarketService {
             throw new RuntimeException("인증이 유효하지 않습니다.");
         }
 
+        String MARKET = "MARKET";
+
         MarketItem marketItem = marketItemRepository.save(requestDTO.toEntity());
 
         addImgsToDBAndS3(itemImgs, marketItem);
