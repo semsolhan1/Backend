@@ -32,9 +32,9 @@ public class BoardReplyService {
 
     private final BoardReplyRepository boardReplyRepository;
 
-    public BoardReplyListResponseDTO getPage(PageDTO dto) {
+    public BoardReplyListResponseDTO getPage(long boardNo, PageDTO dto) {
         Pageable pageable = PageRequest.of(dto.getPage() - 1, dto.getSize(), Sort.by("createDate").descending());
-        Page<BoardReply> boardReplies = boardReplyRepository.findAll(pageable);
+        Page<BoardReply> boardReplies = boardReplyRepository.findByBoardNo(boardNo, pageable);
 
         // 게시글들을 BoardDetailResponseDTO로 변환하여 리스트에 담습니다.
         List<BoardReplyDetailResponseDTO> boardReplyDTOList = boardReplies.stream()
@@ -57,6 +57,7 @@ public class BoardReplyService {
         boardReplyRepository.save(boardReply);
 
         log.info("댓글 등록 성공");
+        log.info(String.valueOf(boardReply));
     }
 
 

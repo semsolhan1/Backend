@@ -28,8 +28,8 @@ public class BoardReplyController {
     private final BoardReplyService boardReplyService;
 
     @GetMapping
-    public ResponseEntity<?> getBoardReply(@ModelAttribute PageDTO pageDTO) {
-        BoardReplyListResponseDTO boardReplyList = boardReplyService.getPage(pageDTO);
+    public ResponseEntity<?> getBoardReply(@PathVariable long boardNo, @ModelAttribute PageDTO pageDTO) {
+        BoardReplyListResponseDTO boardReplyList = boardReplyService.getPage(boardNo, pageDTO);
         return ResponseEntity.ok(boardReplyList);
     }
 
