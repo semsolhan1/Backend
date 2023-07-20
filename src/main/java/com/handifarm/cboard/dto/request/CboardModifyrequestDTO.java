@@ -19,7 +19,7 @@ public class CboardModifyrequestDTO {
     @NotBlank
     private String id;
 
-    private String title;
+    private Integer page;
 
     private String writer;
 
@@ -27,7 +27,7 @@ public class CboardModifyrequestDTO {
 
     private List<String> hashTags;
 
-    private String fileUp;
+    private List<String> imgLinks;
 
     private LocalDateTime boardTime;
 

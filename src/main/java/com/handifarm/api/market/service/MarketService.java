@@ -69,6 +69,8 @@ public class MarketService implements IMarketService {
             throw new RuntimeException("인증이 유효하지 않습니다.");
         }
 
+        String MARKET = "MARKET";
+
         MarketItem marketItem = marketItemRepository.save(requestDTO.toEntity());
 
         if(itemImgs != null && !itemImgs.isEmpty()) {
@@ -76,7 +78,7 @@ public class MarketService implements IMarketService {
                     .map(itemImg -> {
                         try {
                             String uuidFileName = UUID.randomUUID() + "_" + itemImg.getOriginalFilename();
-                            String uploadUrl = s3Service.uploadToS3Bucket(itemImg.getBytes(), uuidFileName);
+                            String uploadUrl = s3Service.uploadToS3Bucket(itemImg.getBytes(), uuidFileName, MARKET);
                             return uploadUrl;
                         } catch (IOException e) {
                             throw new RuntimeException("이미지 업로드에 실패하였습니다.", e);
