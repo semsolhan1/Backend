@@ -22,12 +22,12 @@ public interface IMarketService {
     MarketItemResponseDTO getItem(long itemNo);
 
     // 판매 게시글 수정
-    MarketItemResponseDTO modifyItem(MarketItemModifyRequestDTO requestDTO);
+    MarketItemResponseDTO modifyItem(TokenUserInfo userInfo, long itemNo, MarketItemModifyRequestDTO requestDTO, List<MultipartFile> itemImgs);
 
     // 판매 게시글 삭제
-    void deleteItem(long itemNo);
+    void deleteItem(TokenUserInfo userInfo, long itemNo);
 
     // 판매 완료 처리
-    void doneItem(long itemNo);
+    MarketItemResponseDTO doneItem(long itemNo);
 
 }

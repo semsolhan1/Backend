@@ -111,13 +111,11 @@ public class S3Service {
             String host = uri.getHost();
             int endIndex = host.indexOf(".s3.ap-northeast-2.amazonaws.com");
             if (endIndex == -1) {
-                log.error("Invalid fileLink format: {}", fileLink);
-                throw new RuntimeException("Invalid fileLink format");
+              throw new RuntimeException("Invalid fileLink format: " + fileLink);
             }
             return host.substring(0, endIndex);
         } catch (URISyntaxException e) {
-            log.error("Invalid fileLink format: {}", fileLink);
-            throw new RuntimeException("Invalid fileLink format");
+            throw new RuntimeException("Invalid fileLink format: " + fileLink);
         }
     }
 

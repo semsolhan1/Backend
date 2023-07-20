@@ -6,6 +6,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Setter @Getter
@@ -42,7 +43,8 @@ public class MarketItem {
     private LocalDateTime updateDate;
 
     @OneToMany(mappedBy = "marketItem", cascade = CascadeType.REMOVE)
-    private List<ItemImg> itemImgs;
+    @Builder.Default
+    private List<ItemImg> itemImgs = new ArrayList<>();
 
     // 양방향 매핑에서 리스트 쪽에 데이터를 추가하는 편의 메서드 생성
     public void addItemImg(ItemImg itemImg) {
