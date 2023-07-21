@@ -52,6 +52,7 @@ public class Cboard {
     private List<BoardImg> itemImgs = new ArrayList<>();
 
     @OneToMany(mappedBy = "cboard", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Like> likes = new ArrayList<>();
 
 

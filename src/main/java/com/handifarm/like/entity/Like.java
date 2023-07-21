@@ -21,6 +21,12 @@ public class Like {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "post_id") // postId 컬럼 매핑
+    private Long postId;
+
+    @Column(name = "comment_id") // commentId 컬럼 매핑
+    private Long commentId;
+
     @ManyToOne
     @JoinColumn(name = "cboardId")
     private Cboard cboard;

@@ -41,6 +41,7 @@ public class Recontent {
     private Cboard cboard;
 
     @OneToMany(mappedBy = "recontent", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Like> likes = new ArrayList<>();
 
 
