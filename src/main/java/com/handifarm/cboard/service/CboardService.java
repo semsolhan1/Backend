@@ -35,6 +35,7 @@ import org.webjars.NotFoundException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -342,9 +343,38 @@ public class CboardService {
     }
 
 
-    public Cboard getBoardById(Cboard cboard) {
+    public CboardDetailResponseDTO getBoardById(String cboardId) {
+        Cboard cboardEntity = getCboard(cboardId);
 
-        return getCboard(cboard.getCboardId());
+        // CboardEntity를 CboardDetailResponseDTO로 변환
+        CboardDetailResponseDTO responseDTO = new CboardDetailResponseDTO();
+        responseDTO.setId(cboardEntity.getCboardId());
+        responseDTO.setWriter(cboardEntity.getWriter());
+        responseDTO.setContent(cboardEntity.getContent());
+        responseDTO.setBoardTime(cboardEntity.getBoardTime());
+
+        List<String> hashTags = cboardEntity.getHashTags()
+                .stream()
+                .map(HashTag::getHashName)
+                .collect(Collectors.toList());
+        responseDTO.setHashTags(hashTags);
+
+        List<RecontentDetailResponseDTO> recontentDTOList = cboardEntity.getRecontents()
+                .stream()
+                .map(recontent -> new RecontentDetailResponseDTO(recontent))
+                .sorted(Comparator.comparing(RecontentDetailResponseDTO::getRecontentOrder))
+                .collect(Collectors.toList());
+        responseDTO.setRecontentDTOList(recontentDTOList);
+
+        List<String> imgLinks = cboardEntity.getItemImgs()
+                .stream()
+                .map(BoardImg::getImgLink)
+                .collect(Collectors.toList());
+        responseDTO.setImgLinks(imgLinks);
+
+        responseDTO.setLikeCount(cboardEntity.getLikes().size());
+
+        return responseDTO;
     }
 
     // 이미지 List DB와 S3 버킷에 추가하는 메서드
