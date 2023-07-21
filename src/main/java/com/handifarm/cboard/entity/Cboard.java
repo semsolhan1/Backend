@@ -1,6 +1,7 @@
 package com.handifarm.cboard.entity;
 
 import com.handifarm.api.market.entity.ItemImg;
+import com.handifarm.like.entity.Like;
 import com.handifarm.recontent.entity.Recontent;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -49,6 +50,9 @@ public class Cboard {
     @OneToMany(mappedBy = "cboard", cascade = CascadeType.REMOVE)
     @Builder.Default
     private List<BoardImg> itemImgs = new ArrayList<>();
+
+    @OneToMany(mappedBy = "cboard", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Like> likes = new ArrayList<>();
 
 
     public void addHashTag(HashTag savedTag) {

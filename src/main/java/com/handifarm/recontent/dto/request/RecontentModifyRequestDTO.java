@@ -23,4 +23,6 @@ public class RecontentModifyRequestDTO {
     private LocalDateTime recontentTime;
 
     private Cboard cboardId;
+
+    private int likeCount;
 }

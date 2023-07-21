@@ -266,7 +266,6 @@ public class CboardService {
             }
         }
 
-        // marketItem의 itemImgs에서 삭제된 이미지를 제거합니다.
         cboardEntity.getItemImgs().removeAll(removedItemImgs);
 
         // 새로운 이미지를 데이터베이스와 S3 버킷에 추가합니다.
@@ -366,7 +365,6 @@ public class CboardService {
                     })
                     .collect(Collectors.toList());
 
-            // 데이터베이스와 MarketItem을 연결하며, 새로운 이미지들을 추가합니다.
             uploadUrls.forEach(url -> {
                 BoardImg savedItemImg = boardImgRepository.save(BoardImg.builder()
                         .imgLink(url)

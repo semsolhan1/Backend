@@ -27,6 +27,8 @@ public class RecontentCreateRequestDTO {
 
     private Cboard cboardId;
 
+    private int likeCount;
+
 //    private String cboard;
 
     public Recontent toEntity(Cboard cboard) {

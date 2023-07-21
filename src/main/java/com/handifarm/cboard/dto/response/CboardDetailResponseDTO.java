@@ -28,6 +28,7 @@ public class CboardDetailResponseDTO {
     private List<String> imgLinks;
     private LocalDateTime boardTime;
     private List<RecontentDetailResponseDTO> recontentDTOList;
+    private int likeCount;
 
     public CboardDetailResponseDTO(Cboard cboard){
         this.id = cboard.getCboardId();
