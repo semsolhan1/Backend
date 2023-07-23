@@ -22,6 +22,7 @@ public class RecontentListResponseDTO {
 
     private List<RecontentDetailResponseDTO> board;
 
+    private List<Integer> likeCountList;
 //    private RecontentDetailResponseDTO previousCboard;
 
 }

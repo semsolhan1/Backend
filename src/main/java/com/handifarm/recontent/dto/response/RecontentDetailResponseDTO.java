@@ -24,6 +24,8 @@ public class RecontentDetailResponseDTO {
     @JsonIgnore
     private CboardDetailResponseDTO cboard;
 
+    private int likeCount;
+
     public RecontentDetailResponseDTO(Recontent recontent){
         this.recontentOrder = recontent.getRecontentOrder();
         this.rewriter = recontent.getRewriter();
