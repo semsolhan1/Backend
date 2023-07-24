@@ -2,6 +2,7 @@ package com.handifarm.api.user.service;
 
 import com.handifarm.api.user.dto.request.UserJoinRequestDTO;
 import com.handifarm.api.user.dto.request.UserLoginRequestDTO;
+import com.handifarm.api.user.dto.response.UserInfoResponseDTO;
 import com.handifarm.api.user.dto.response.UserLoginResponseDTO;
 import com.handifarm.jwt.TokenUserInfo;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,7 +21,10 @@ public interface IUserService {
     // 로그인 처리 및 토큰 발급
     UserLoginResponseDTO authenticate(final UserLoginRequestDTO dto);
 
+    // 유저 정보 반환
+    UserInfoResponseDTO userInfo(final TokenUserInfo userInfo);
+
     // 프로필 이미지 등록
-    String uploadUserProfileImg(TokenUserInfo userInfo, MultipartFile profileImg) throws Exception;
+    String uploadUserProfileImg(final TokenUserInfo userInfo, final MultipartFile profileImg) throws Exception;
 
 }

@@ -25,4 +25,5 @@ public class CboardListResponseDTO {
 
     private CboardDetailResponseDTO previousCboard;
 
+    private List<Integer> likeCountList;
 }

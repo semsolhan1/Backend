@@ -2,15 +2,18 @@ package com.handifarm.recontent.entity;
 
 
 import com.handifarm.cboard.entity.Cboard;
+import com.handifarm.like.entity.Like;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
-@ToString(exclude = {"cboard"})
+@ToString(exclude = {"cboard","likes"})
 @EqualsAndHashCode(of = "recontentOrder")
 @NoArgsConstructor
 @AllArgsConstructor
@@ -36,6 +39,10 @@ public class Recontent {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "cboard_id")
     private Cboard cboard;
+
+    @OneToMany(mappedBy = "recontent", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Like> likes = new ArrayList<>();
 
 
 }

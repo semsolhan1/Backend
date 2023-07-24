@@ -33,6 +33,8 @@ public class CboardModifyrequestDTO {
 
     private List<RecontentDetailResponseDTO> recontentDTOList;
 
+    private int likeCount;
+
 //    public Cboard toModifyEntity(Cboard ModifyBoard,String uploadedFilePath){
 //        return Cboard.builder()
 //                .title(ModifyBoard.getTitle())

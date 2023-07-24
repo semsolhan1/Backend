@@ -3,6 +3,7 @@ package com.handifarm.cboard.api;
 import com.handifarm.cboard.dto.page.PageDTO;
 import com.handifarm.cboard.dto.request.CboardCreateRequestDTO;
 import com.handifarm.cboard.dto.request.CboardModifyrequestDTO;
+import com.handifarm.cboard.dto.response.CboardDetailResponseDTO;
 import com.handifarm.cboard.dto.response.CboardListResponseDTO;
 import com.handifarm.cboard.entity.Cboard;
 import com.handifarm.cboard.service.CboardService;
@@ -15,6 +16,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import org.webjars.NotFoundException;
 
 import java.util.List;
@@ -39,17 +41,14 @@ public class CboardController {
     //게시판 개별 조회
     @GetMapping("/{cboardId}")
     public ResponseEntity<?> boardsearch(
-            @PathVariable("cboardId") Cboard cboardId
+            @PathVariable("cboardId") String cboardId
             ){
 
-        log.info("get -{}", cboardId);
-
-        Cboard dto = cboardService.getBoardById(cboardId);
-
-        if(dto != null) {
-            return ResponseEntity.ok().body(dto);
-        } else {
-            return ResponseEntity.notFound().build();
+        try {
+            CboardDetailResponseDTO responseDTO = cboardService.getBoardById(cboardId);
+            return ResponseEntity.ok().body(responseDTO);
+        } catch (RuntimeException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
     }
 

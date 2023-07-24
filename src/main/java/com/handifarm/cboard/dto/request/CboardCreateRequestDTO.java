@@ -32,6 +32,8 @@ public class CboardCreateRequestDTO {
 
     private LocalDateTime boardTime;
 
+    private int likeCount;
+
     public Cboard toEntity(){
         return Cboard.builder()
                 .writer(this.writer)

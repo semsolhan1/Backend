@@ -2,6 +2,7 @@ package com.handifarm.api.user.service;
 
 import com.handifarm.api.user.dto.request.UserJoinRequestDTO;
 import com.handifarm.api.user.dto.request.UserLoginRequestDTO;
+import com.handifarm.api.user.dto.response.UserInfoResponseDTO;
 import com.handifarm.api.user.dto.response.UserLoginResponseDTO;
 import com.handifarm.api.user.entity.User;
 import com.handifarm.api.user.repository.UserRepository;
@@ -46,13 +47,13 @@ public class UserService implements IUserService {
 
     // ID 중복 체크
     @Override
-    public boolean idDuplicateCheck(String userId) {
+    public boolean idDuplicateCheck(final String userId) {
         return userRepository.existsByUserId(userId);
     }
 
     // 휴대폰 인증번호 전송
     @Override
-    public String sendMessage(String phoneNum) {
+    public String sendMessage(final String phoneNum) {
         log.info("서비스에서 넘겨받은 변수 : {}", phoneNum);
 
         // 인증번호 생성
@@ -108,7 +109,7 @@ public class UserService implements IUserService {
 
     // 로그인 처리 및 토큰 발급
     @Override
-    public UserLoginResponseDTO authenticate(UserLoginRequestDTO dto) {
+    public UserLoginResponseDTO authenticate(final UserLoginRequestDTO dto) {
 
         User user = userRepository.findById(dto.getUserId()).
                 orElseThrow(() -> new RuntimeException("가입된 회원이 아닙니다."));
@@ -127,16 +128,25 @@ public class UserService implements IUserService {
         return new UserLoginResponseDTO(user, token);
     }
 
+    // 유저 정보 반환
+    @Override
+    public UserInfoResponseDTO userInfo(final TokenUserInfo userInfo) {
+
+        User user = userRepository.findById(userInfo.getUserId())
+                .orElseThrow(() -> new RuntimeException("회원 조회에 실패했습니다."));
+
+        return new UserInfoResponseDTO(user);
+    }
+
     // 프로필 이미지 등록
     @Override
-    public String uploadUserProfileImg(TokenUserInfo userInfo, MultipartFile profileImg) throws Exception {
-        String serviceName = "USER";
+    public String uploadUserProfileImg(final TokenUserInfo userInfo, final MultipartFile profileImg) throws Exception {
 
         if (profileImg == null) {
             throw new RuntimeException("프로필 사진이 업로드되지 않았습니다.");
         }
 
-        String USER = "USER";
+        String serviceName = "USER";
 
         User user = userRepository.findById(userInfo.getUserId()).orElseThrow(() -> new RuntimeException("회원 조회 실패."));
 
