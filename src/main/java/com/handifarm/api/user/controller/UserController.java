@@ -2,6 +2,7 @@ package com.handifarm.api.user.controller;
 
 import com.handifarm.api.user.dto.request.UserJoinRequestDTO;
 import com.handifarm.api.user.dto.request.UserLoginRequestDTO;
+import com.handifarm.api.user.dto.response.UserInfoResponseDTO;
 import com.handifarm.api.user.dto.response.UserLoginResponseDTO;
 import com.handifarm.api.user.service.UserService;
 import com.handifarm.jwt.TokenUserInfo;
@@ -85,6 +86,18 @@ public class UserController {
         try {
             UserLoginResponseDTO responseDTO = service.authenticate(dto);
             return ResponseEntity.ok().body(responseDTO);
+        } catch (Exception e) {
+            log.warn(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // 마이페이지 진입 시 유저 정보 반환
+    @GetMapping("/mypage")
+    public ResponseEntity<?> mypage(@AuthenticationPrincipal TokenUserInfo userInfo) {
+        try {
+            UserInfoResponseDTO userInfoResponseDTO = service.userInfo(userInfo);
+            return ResponseEntity.ok().body(userInfoResponseDTO);
         } catch (Exception e) {
             log.warn(e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
