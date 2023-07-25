@@ -13,23 +13,25 @@ import java.time.LocalDateTime;
 public class UserInfoResponseDTO {
 
     private String userName;
+    private String userNick;
     private String userEmail;
     private String userPhone;
     private String userAddrBasic;
     private String userAddrDetail;
-    private String userNick;
     private int userPostcode;
+    private String userProfileImg;
     @JsonFormat(pattern = "yyyy년 MM월 dd일")
     private LocalDateTime joinDate;
 
     public UserInfoResponseDTO(User user) {
         this.userName = user.getUserName();
-        this.userEmail = user.getUserEmail();
-        this.userPhone = user.getUserPhoneNum();
-        this.userAddrBasic = user.getAddrBasic();
-        this.userAddrDetail = user.getAddrDetail();
-        this.userPostcode = user.getAddrZipCode();
         this.userNick = user.getUserNick();
+        this.userEmail = user.getUserEmail();
+        this.userPhone = user.getUserPhone();
+        this.userAddrBasic = user.getUserAddrBasic();
+        this.userAddrDetail = user.getUserAddrDetail();
+        this.userPostcode = user.getUserPostcode();
+        this.userProfileImg = user.getUserProfileImg();
         this.joinDate = user.getJoinDate();
     }
 }

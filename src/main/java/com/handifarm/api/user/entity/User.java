@@ -26,21 +26,21 @@ public class User {
     @Column(nullable = false)
     private String userName;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String userNick;
 
     @Column(nullable = false)
-    private String userPhoneNum;
+    private String userPhone;
 
     @Column(nullable = false)
     private String userEmail;
 
     @Column(nullable = false)
-    private String addrBasic;
+    private String userAddrBasic;
     @Column(nullable = false)
-    private String addrDetail;
+    private String userAddrDetail;
     @Column(nullable = false)
-    private int addrZipCode;
+    private int userPostcode;
 
     private String userProfileImg;
 

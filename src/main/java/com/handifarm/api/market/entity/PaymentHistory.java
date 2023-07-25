@@ -12,13 +12,16 @@ import java.time.LocalDateTime;
 @NoArgsConstructor @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "tbl_trans_history")
-public class TransHistory {
+@Table(name = "tbl_payment_history")
+public class PaymentHistory {
 
     @Id
     @GeneratedValue(generator = "system-uuid")
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
     private String resultCode;
+
+    @Column(nullable = false)
+    private String orderId;
 
     @Column(nullable = false)
     private String buyer;
@@ -33,6 +36,6 @@ public class TransHistory {
     private int price;
 
     @CreationTimestamp
-    private LocalDateTime transDate;
+    private LocalDateTime paymentDate;
 
 }

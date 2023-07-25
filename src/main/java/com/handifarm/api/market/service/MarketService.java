@@ -74,8 +74,6 @@ public class MarketService implements IMarketService {
             throw new RuntimeException("인증이 유효하지 않습니다.");
         }
 
-        String MARKET = "MARKET";
-
         MarketItem marketItem = marketItemRepository.save(requestDTO.toEntity());
 
         addImgsToDBAndS3(itemImgs, marketItem);
@@ -138,31 +136,35 @@ public class MarketService implements IMarketService {
 
     // 이미지 List DB와 S3 버킷에 추가하는 메서드
     private void addImgsToDBAndS3(List<MultipartFile> itemImgs, MarketItem marketItem) {
+
+        if (itemImgs == null || itemImgs.isEmpty()) {
+            throw new RuntimeException("게시물 사진이 업로드되지 않았습니다.");
+        }
+
         String serviceName = "MARKET";
 
-        if (itemImgs != null && !itemImgs.isEmpty()) {
-            List<String> uploadUrls = itemImgs.stream()
-                    .map(itemImg -> {
-                        try {
-                            String uuidFileName = UUID.randomUUID() + "_" + itemImg.getOriginalFilename();
-                            String uploadUrl = s3Service.uploadToS3Bucket(itemImg.getBytes(), uuidFileName, serviceName);
-                            return uploadUrl;
-                        } catch (IOException e) {
-                            log.error("이미지 업로드에 실패하였습니다.", e);
-                            throw new RuntimeException("이미지 업로드에 실패하였습니다.");
-                        }
-                    })
-                    .collect(Collectors.toList());
+        List<String> uploadUrls = itemImgs.stream()
+                .map(itemImg -> {
+                    try {
+                        String uuidFileName = UUID.randomUUID() + "_" + itemImg.getOriginalFilename();
+                        String uploadUrl = s3Service.uploadToS3Bucket(itemImg.getBytes(), uuidFileName, serviceName);
+                        return uploadUrl;
+                    } catch (IOException e) {
+                        log.error("이미지 업로드에 실패하였습니다.", e);
+                        throw new RuntimeException("이미지 업로드에 실패하였습니다.");
+                    }
+                })
+                .collect(Collectors.toList());
 
-            // 데이터베이스와 MarketItem을 연결하며, 새로운 이미지들을 추가합니다.
-            uploadUrls.forEach(url -> {
-                ItemImg savedItemImg = itemImgRepository.save(ItemImg.builder()
-                        .imgLink(url)
-                        .marketItem(marketItem)
-                        .build());
-                marketItem.addItemImg(savedItemImg);
-            });
-        }
+        // 데이터베이스와 MarketItem을 연결하며, 새로운 이미지들을 추가합니다.
+        uploadUrls.forEach(url -> {
+            ItemImg savedItemImg = itemImgRepository.save(ItemImg.builder()
+                    .imgLink(url)
+                    .marketItem(marketItem)
+                    .build());
+            marketItem.addItemImg(savedItemImg);
+        });
+
     }
 
     // 판매 게시글 삭제
