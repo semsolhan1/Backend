@@ -1,5 +1,6 @@
 package com.handifarm.api.user.service;
 
+import com.handifarm.api.user.dto.request.UserInfoModifyRequestDTO;
 import com.handifarm.api.user.dto.request.UserJoinRequestDTO;
 import com.handifarm.api.user.dto.request.UserLoginRequestDTO;
 import com.handifarm.api.user.dto.response.UserInfoResponseDTO;
@@ -23,6 +24,9 @@ public interface IUserService {
 
     // 유저 정보 반환
     UserInfoResponseDTO userInfo(final TokenUserInfo userInfo);
+
+    // 유저 정보 수정
+    UserInfoResponseDTO userInfoModify(final TokenUserInfo userInfo, final UserInfoModifyRequestDTO requestDTO, final MultipartFile profileImg) throws Exception;
 
     // 프로필 이미지 등록
     String uploadUserProfileImg(final TokenUserInfo userInfo, final MultipartFile profileImg) throws Exception;

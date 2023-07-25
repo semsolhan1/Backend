@@ -1,5 +1,6 @@
 package com.handifarm.api.user.controller;
 
+import com.handifarm.api.user.dto.request.UserInfoModifyRequestDTO;
 import com.handifarm.api.user.dto.request.UserJoinRequestDTO;
 import com.handifarm.api.user.dto.request.UserLoginRequestDTO;
 import com.handifarm.api.user.dto.response.UserInfoResponseDTO;
@@ -100,6 +101,25 @@ public class UserController {
             return ResponseEntity.ok().body(userInfoResponseDTO);
         } catch (Exception e) {
             log.warn(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // 유저 정보 수정 요청 처리
+    @PutMapping("/modifyUser")
+    public ResponseEntity<?> modifyInfo(@AuthenticationPrincipal TokenUserInfo userInfo,
+                                        @Validated @RequestPart("userInfo")UserInfoModifyRequestDTO requestDTO,
+                                        @RequestPart(value = "profileImg", required = false) MultipartFile profileImg,
+                                        BindingResult result) {
+        if(result.hasErrors()) {
+            log.warn(result.toString());
+            return ResponseEntity.badRequest().body(result.getFieldError());
+        }
+
+        try {
+            UserInfoResponseDTO userInfoResponseDTO = service.userInfoModify(userInfo, requestDTO, profileImg);
+            return ResponseEntity.ok().body(userInfoResponseDTO);
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
