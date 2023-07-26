@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Setter @Getter
-@ToString @EqualsAndHashCode()
+@ToString @EqualsAndHashCode(of = "userId")
 @NoArgsConstructor @AllArgsConstructor
 @Builder
 @Entity
