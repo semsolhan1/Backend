@@ -73,6 +73,13 @@ public class S3Service {
     }
 
     public void deleteFromS3Bucket(String fileLink) {
+
+        // 파일 링크가 존재하지 않으면 종료.
+        if (fileLink == null || fileLink.trim().equals("")) {
+            log.warn("Invalid fileLink. Cannot delete from S3.");
+            return;
+        }
+
         // fileLink에서 버킷 이름과 파일 키를 추출
         String bucketName = getBucketNameFromLink(fileLink);
         String key = getKeyFromLink(fileLink);
