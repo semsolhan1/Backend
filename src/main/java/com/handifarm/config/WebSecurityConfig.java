@@ -43,6 +43,7 @@ public class WebSecurityConfig {
                 .antMatchers(HttpMethod.PATCH, "/api/user/profile").authenticated()
                 .antMatchers(HttpMethod.GET, "/api/user/mypage").authenticated()
                 .antMatchers(HttpMethod.PUT, "/api/user/modifyUser").authenticated()
+                .antMatchers(HttpMethod.GET, "/api/*").permitAll()
                 .antMatchers("/", "/api/user/**").permitAll()
 //                .antMatchers(HttpMethod.POST, "/api/todos").hasRole("ADMIN")
                 .anyRequest().authenticated();

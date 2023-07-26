@@ -24,9 +24,8 @@ public class BoardController {
 
     // 게시글 전체 조회
     @GetMapping
-    public ResponseEntity<?> getBoard(@RequestParam("page") int page, @RequestParam("size") int size) {
-        PageDTO dto = new PageDTO(page, size);
-        BoardListResponseDTO boardList = boardService.getPage(dto);
+    public ResponseEntity<?> getBoard(PageDTO pageDTO) {
+        BoardListResponseDTO boardList = boardService.getPage(pageDTO);
         return ResponseEntity.ok(boardList);
     }
 
