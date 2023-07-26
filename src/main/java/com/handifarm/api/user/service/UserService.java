@@ -46,7 +46,7 @@ public class UserService implements IUserService {
     @Value("${sendMsg.sendNumber}")
     private String sendNumber;
 
-    private String serviceName = "USER";
+    private final String serviceName = "USER";
 
     // ID 중복 체크
     @Override
@@ -146,13 +146,17 @@ public class UserService implements IUserService {
     public UserInfoResponseDTO userInfoModify(final TokenUserInfo userInfo,
                                               final UserInfoModifyRequestDTO requestDTO,
                                               final MultipartFile profileImg) throws Exception {
-        if (userInfo.getUserId().equals(requestDTO.getUserId())) {
-            throw new RuntimeException("인증이 유효하지 않습니다.");
-        }
+//        if (!userInfo.getUserId().equals(requestDTO.getUserId())) {
+//            throw new RuntimeException("인증이 유효하지 않습니다.");
+//        }
 
-        User user = userRepository.findById(requestDTO.getUserId()).orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+        User user = userRepository.findById(userInfo.getUserId()).orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
 
         if (profileImg != null && !profileImg.isEmpty()) {
+            // 프로필 이미지가 변경되면 기존 이미지는 삭제
+            log.info("프로필 이미지가 변경되면 기존 이미지는 삭제");
+            s3Service.deleteFromS3Bucket(user.getUserProfileImg());
+
             String uuidFileName = UUID.randomUUID() + "_" + profileImg.getOriginalFilename();
 
             String uploadUrl = s3Service.uploadToS3Bucket(profileImg.getBytes(), uuidFileName, serviceName);
@@ -160,9 +164,10 @@ public class UserService implements IUserService {
             user.setUserProfileImg(uploadUrl);
         }
 
-        if (requestDTO.getUserPw() != null || !requestDTO.getUserPw().trim().equals("")) {
-            user.setUserPw(encoder.encode(requestDTO.getUserPw()));
+        if (requestDTO.getUserPw() != null) {
+            if (!requestDTO.getUserPw().trim().equals("")) user.setUserPw(encoder.encode(requestDTO.getUserPw()));
         }
+
         user.setUserName(requestDTO.getUserName());
         user.setUserNick(requestDTO.getUserNick());
         user.setUserEmail(requestDTO.getUserEmail());
