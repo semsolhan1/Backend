@@ -27,7 +27,7 @@ public class MarketController {
 
     // 판매 게시글 목록 요청
     @GetMapping
-    public ResponseEntity<?> getList(@ModelAttribute PageDTO pageDTO) {
+    public ResponseEntity<?> getList(PageDTO pageDTO) {
         log.info("판매 게시글 목록 요청!");
         MarketItemListResponseDTO itemList = marketService.getItemList(pageDTO);
         return ResponseEntity.ok().body(itemList);
