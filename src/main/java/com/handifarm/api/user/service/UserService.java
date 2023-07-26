@@ -146,14 +146,15 @@ public class UserService implements IUserService {
     public UserInfoResponseDTO userInfoModify(final TokenUserInfo userInfo,
                                               final UserInfoModifyRequestDTO requestDTO,
                                               final MultipartFile profileImg) throws Exception {
-        if (!userInfo.getUserId().equals(requestDTO.getUserId())) {
-            throw new RuntimeException("인증이 유효하지 않습니다.");
-        }
+//        if (!userInfo.getUserId().equals(requestDTO.getUserId())) {
+//            throw new RuntimeException("인증이 유효하지 않습니다.");
+//        }
 
-        User user = userRepository.findById(requestDTO.getUserId()).orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+        User user = userRepository.findById(userInfo.getUserId()).orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
 
         if (profileImg != null && !profileImg.isEmpty()) {
             // 프로필 이미지가 변경되면 기존 이미지는 삭제
+            log.info("프로필 이미지가 변경되면 기존 이미지는 삭제");
             s3Service.deleteFromS3Bucket(user.getUserProfileImg());
 
             String uuidFileName = UUID.randomUUID() + "_" + profileImg.getOriginalFilename();

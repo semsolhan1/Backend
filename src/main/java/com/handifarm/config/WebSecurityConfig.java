@@ -41,8 +41,8 @@ public class WebSecurityConfig {
                 // 어떤 요청에서 인증을 안 할 것인지 설정, 언제 할 것인지 설정
                 .authorizeRequests()
                 .antMatchers(HttpMethod.PATCH, "/api/user/profile").authenticated()
-                .antMatchers(HttpMethod.PATCH, "/api/user/mypage").authenticated()
-                .antMatchers(HttpMethod.PATCH, "/api/user/modifyUser").authenticated()
+                .antMatchers(HttpMethod.GET, "/api/user/mypage").authenticated()
+                .antMatchers(HttpMethod.PUT, "/api/user/modifyUser").authenticated()
                 .antMatchers(HttpMethod.GET, "/api/*").permitAll()
                 .antMatchers("/", "/api/user/**").permitAll()
 //                .antMatchers(HttpMethod.POST, "/api/todos").hasRole("ADMIN")

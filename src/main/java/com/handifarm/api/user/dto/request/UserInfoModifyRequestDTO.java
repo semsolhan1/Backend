@@ -13,9 +13,9 @@ import javax.validation.constraints.Size;
 @Builder
 public class UserInfoModifyRequestDTO {
 
-    @NotBlank
-    @Size(min = 6, max = 15)
-    private String userId;
+//    @NotBlank
+//    @Size(min = 6, max = 15)
+//    private String userId;
 
     @Size(max = 20)
     private String userPw;
