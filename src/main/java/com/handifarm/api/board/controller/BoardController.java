@@ -4,6 +4,7 @@ import com.handifarm.api.board.dto.request.BoardModifyRequestDTO;
 import com.handifarm.api.board.dto.request.BoardWriteRequestDTO;
 import com.handifarm.api.board.dto.response.BoardDetailResponseDTO;
 import com.handifarm.api.board.dto.response.BoardListResponseDTO;
+import com.handifarm.api.board.entity.Board;
 import com.handifarm.api.board.service.BoardService;
 import com.handifarm.api.util.page.PageDTO;
 import com.handifarm.jwt.TokenUserInfo;
@@ -13,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -25,8 +28,20 @@ public class BoardController {
     // 게시글 전체 조회
     @GetMapping
     public ResponseEntity<?> getBoard(PageDTO pageDTO) {
+        System.out.println("Frontend에서 전달된 검색 조건: " + pageDTO.getCategory() + ", " + pageDTO.getCondition());
         BoardListResponseDTO boardList = boardService.getPage(pageDTO);
         return ResponseEntity.ok(boardList);
+    }
+
+    // 조건별 조회
+    @GetMapping("/search")
+    public ResponseEntity<List<Board>> searchBoards(
+            @RequestParam(name = "category", defaultValue = "all") String category,
+            @RequestParam(name = "condition", defaultValue = "all") String condition,
+            @RequestParam(name = "searchWord", defaultValue = "") String searchWord
+    ) {
+        List<Board> boards = boardService.searchBoards(category, condition, searchWord);
+        return new ResponseEntity<>(boards, HttpStatus.OK);
     }
 
     // 특정 게시글 조회
