@@ -12,7 +12,7 @@ import java.util.List;
 public class MarketItemListResponseDTO {
 
     private int count;
-    private PageResponseDTO pageInfo;
+    private PageResponseDTO<?> pageInfo;
     private List<MarketItemResponseDTO> marketItems;
 
 }

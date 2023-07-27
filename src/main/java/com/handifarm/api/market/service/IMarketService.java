@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface IMarketService {
 
-    // 판매 게시글 목록 요청
+    // 판매 게시글 목록
     MarketItemListResponseDTO getItemList(PageDTO pageDTO);
 
     // 판매 게시글 등록

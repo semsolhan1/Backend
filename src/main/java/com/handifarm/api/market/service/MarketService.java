@@ -38,7 +38,7 @@ public class MarketService implements IMarketService {
     private final ItemImgRepository itemImgRepository;
     private final S3Service s3Service;
 
-    // 판매 게시글 목록 요청
+    // 판매 게시글 목록
     @Override
     public MarketItemListResponseDTO getItemList(final PageDTO dto) {
 
@@ -58,7 +58,7 @@ public class MarketService implements IMarketService {
 
         return MarketItemListResponseDTO.builder()
                 .count(itemResponseDTOList.size())
-                .pageInfo(new PageResponseDTO(marketItems))
+                .pageInfo(new PageResponseDTO<>(marketItems))
                 .marketItems(itemResponseDTOList)
                 .build();
     }
@@ -147,8 +147,8 @@ public class MarketService implements IMarketService {
                 .map(itemImg -> {
                     try {
                         String uuidFileName = UUID.randomUUID() + "_" + itemImg.getOriginalFilename();
-                        String uploadUrl = s3Service.uploadToS3Bucket(itemImg.getBytes(), uuidFileName, serviceName);
-                        return uploadUrl;
+                        // S3 버킷에 업로드 된 URL을 리턴
+                        return s3Service.uploadToS3Bucket(itemImg.getBytes(), uuidFileName, serviceName);
                     } catch (IOException e) {
                         log.error("이미지 업로드에 실패하였습니다.", e);
                         throw new RuntimeException("이미지 업로드에 실패하였습니다.");

@@ -1,10 +1,24 @@
-//package com.handifarm.api.snsBoard.dto.request;
-//
-//import lombok.*;
-//
-//@Getter @Setter
-//@ToString @EqualsAndHashCode
-//@NoArgsConstructor @AllArgsConstructor
-//@Builder
-//public class SNSBoardModifyRequestDTO {
-//}
+package com.handifarm.api.snsBoard.dto.request;
+
+import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.constraints.NotBlank;
+import java.util.List;
+
+@Getter @Setter
+@ToString @EqualsAndHashCode
+@NoArgsConstructor @AllArgsConstructor
+@Builder
+public class SNSBoardModifyRequestDTO {
+
+    @NotBlank
+    private String content;
+
+    List<String> snsImgs;
+
+    List<MultipartFile> newSnsImgs;
+
+    List<String> hashTags;
+
+}
