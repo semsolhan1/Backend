@@ -20,6 +20,8 @@ public class SnsImg {
     @Column(nullable = false)
     private String snsImgLink;
 
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "snsNo")
+    private SnsBoard snsBoard;
 
 }

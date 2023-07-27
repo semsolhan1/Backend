@@ -33,4 +33,16 @@ public class SnsBoard {
     @CreationTimestamp
     private LocalDateTime uploadTime;
 
+    @OneToMany(mappedBy = "snsBoard", cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<SnsHashTag> hashTags = new ArrayList<>();
+
+    @OneToMany(mappedBy = "snsBoard", cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<SnsReply> replyList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "snsBoard", cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<SnsLike> likes = new ArrayList<>();
+
 }
