@@ -1,5 +1,6 @@
 package com.handifarm.api.snsBoard.entity;
 
+import com.handifarm.api.market.entity.ItemImg;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -40,6 +41,26 @@ public class SnsBoard {
 
     @OneToMany(mappedBy = "snsBoard", cascade = CascadeType.ALL)
     @Builder.Default
+    private List<SnsImg> snsImgs = new ArrayList<>();
+
+    @OneToMany(mappedBy = "snsBoard", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<SnsLike> likes = new ArrayList<>();
+
+    // SNS Img 추가 편의 메서드
+    public void addSnsImg(SnsImg snsImg) {
+        snsImgs.add(snsImg);
+        if(this != snsImg.getSnsBoard()) {
+            snsImg.setSnsBoard(this);
+        }
+    }
+
+    // SNS HashTag 추가 편의 메서드
+    public void addHashTag(SnsHashTag hashTag) {
+        hashTags.add(hashTag);
+        if(this != hashTag.getSnsBoard()) {
+            hashTag.setSnsBoard(this);
+        }
+    }
 
 }

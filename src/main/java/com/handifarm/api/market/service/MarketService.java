@@ -77,7 +77,8 @@ public class MarketService implements IMarketService {
 
         MarketItem marketItem = marketItemRepository.save(requestDTO.toEntity());
 
-        addImgsToDBAndS3(itemImgs, marketItem);
+        // 상품 이미지가 존재할 때만 DB와 S3 버킷에 추가
+        if (itemImgs != null && !itemImgs.isEmpty()) addImgsToDBAndS3(itemImgs, marketItem);
 
         return new MarketItemResponseDTO(marketItem);
 
@@ -126,7 +127,7 @@ public class MarketService implements IMarketService {
         // marketItem의 itemImgs에서 삭제된 이미지를 제거합니다.
         marketItem.getItemImgs().removeAll(removedItemImgs);
 
-        // 새로운 이미지가 존재할 때만 이미지를 데이터베이스와 S3 버킷에 추가합니다.
+        // 새로운 이미지가 존재할 때만 이미지를 DB와 S3 버킷에 추가합니다.
         if (itemImgs != null && !itemImgs.isEmpty()) addImgsToDBAndS3(itemImgs, marketItem);
 
         // 수정된 MarketItem을 데이터베이스에 저장합니다.
@@ -135,12 +136,8 @@ public class MarketService implements IMarketService {
         return new MarketItemResponseDTO(savedMarketItem);
     }
 
-    // 이미지 List DB와 S3 버킷에 추가하는 메서드
+    // 이미지 List를 DB와 S3 버킷에 추가하는 메서드
     private void addImgsToDBAndS3(List<MultipartFile> itemImgs, MarketItem marketItem) {
-
-        if (itemImgs == null || itemImgs.isEmpty()) {
-            throw new RuntimeException("게시물 사진이 업로드되지 않았습니다.");
-        }
 
         List<String> uploadUrls = itemImgs.stream()
                 .map(itemImg -> {

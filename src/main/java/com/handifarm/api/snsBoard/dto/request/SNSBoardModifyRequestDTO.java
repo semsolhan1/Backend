@@ -15,10 +15,10 @@ public class SNSBoardModifyRequestDTO {
     @NotBlank
     private String content;
 
-    List<String> snsImgs;
+    private List<String> snsImgs;
 
-    List<MultipartFile> newSnsImgs;
+    private List<MultipartFile> newSnsImgs;
 
-    List<String> hashTags;
+    private List<String> hashTags;
 
 }

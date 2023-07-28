@@ -2,6 +2,7 @@ package com.handifarm.api.snsBoard.controller;
 
 import com.handifarm.api.snsBoard.dto.request.SNSBoardCreateRequestDTO;
 import com.handifarm.api.snsBoard.dto.request.SNSBoardModifyRequestDTO;
+import com.handifarm.api.snsBoard.dto.response.SNSBoardResponseDTO;
 import com.handifarm.api.snsBoard.service.SnsBoardService;
 import com.handifarm.api.util.page.PageDTO;
 import com.handifarm.jwt.TokenUserInfo;
@@ -44,8 +45,9 @@ public class SnsBoardController {
     @PostMapping
     public ResponseEntity<?> uploadSns(
             @AuthenticationPrincipal TokenUserInfo userInfo,
-            @Validated @RequestPart("snsContent") SNSBoardCreateRequestDTO dto,
-            @RequestPart(value = "snsImgs", required = false)List<MultipartFile> snsImgs,
+//            @Validated @RequestPart("snsContent") SNSBoardCreateRequestDTO dto,
+//            @RequestPart(value = "snsImgs")List<MultipartFile> snsImgs,
+            @Validated SNSBoardCreateRequestDTO dto,
             BindingResult result
             ) {
         log.info("SNS 게시글 등록 요청! - DTO : {}", dto);
@@ -55,7 +57,13 @@ public class SnsBoardController {
             return ResponseEntity.badRequest().body(result.getFieldError());
         }
 
-        return null;
+        try {
+            SNSBoardResponseDTO snsBoardResponseDTO = snsBoardService.uploadSns(userInfo, dto, dto.getSnsImgs());
+            return ResponseEntity.ok().body(snsBoardResponseDTO);
+        } catch (Exception e) {
+            log.error("SNS 게시글 등록 중 오류 발생", e);
+            return ResponseEntity.badRequest().body("SNS 게시글 등록 중 오류 발생 : " + e.getMessage());
+        }
     }
 
     // SNS 게시글 수정
