@@ -54,7 +54,7 @@ public class MarketController {
             return ResponseEntity.ok().body(marketItemResponseDTO);
         } catch (Exception e) {
             log.error("판매 게시글 등록 중 오류 발생", e);
-            return ResponseEntity.badRequest().body("판매 게시글 등록 중 오류 발생: " + e.getMessage());
+            return ResponseEntity.badRequest().body("판매 게시글 등록 중 오류 발생 : " + e.getMessage());
         }
     }
 

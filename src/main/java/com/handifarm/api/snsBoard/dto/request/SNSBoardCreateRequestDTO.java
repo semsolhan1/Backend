@@ -17,8 +17,8 @@ public class SNSBoardCreateRequestDTO {
     private String content;
 
     @NotNull
-    List<MultipartFile> snsImgs;
+    private List<MultipartFile> snsImgs;
 
-    List<String> hashTags;
+    private List<String> hashTags;
 
 }
