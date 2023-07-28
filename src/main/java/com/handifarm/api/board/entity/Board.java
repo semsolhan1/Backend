@@ -41,6 +41,7 @@ public class Board {
     @UpdateTimestamp
     private LocalDateTime updateDate;
 
+
     public enum Category {
         NOTICE,
         FREE,

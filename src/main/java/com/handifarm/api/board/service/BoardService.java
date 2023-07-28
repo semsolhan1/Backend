@@ -6,7 +6,7 @@ import com.handifarm.api.board.dto.response.BoardDetailResponseDTO;
 import com.handifarm.api.board.dto.response.BoardListResponseDTO;
 import com.handifarm.api.board.entity.Board;
 import com.handifarm.api.board.repository.BoardRepository;
-import com.handifarm.api.user.repository.UserRepository;
+import com.handifarm.api.board.repository.BoardSearchRepositoryImpl;
 import com.handifarm.api.util.page.PageDTO;
 import com.handifarm.api.util.page.PageResponseDTO;
 import com.handifarm.jwt.TokenUserInfo;
@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 public class BoardService implements IBoardService {
 
     private final BoardRepository boardRepository;
+    private final BoardSearchRepositoryImpl boardSearchRepositoryImpl;
 
     public BoardListResponseDTO retrieve() {
 
@@ -44,6 +45,12 @@ public class BoardService implements IBoardService {
         return BoardListResponseDTO.builder()
                 .boards(dtoList)
                 .build();
+    }
+
+
+
+    public List<Board> searchBoards(String category, String condition, String searchWord) {
+        return boardSearchRepositoryImpl.searchBoardList(category, condition, searchWord);
     }
 
 
@@ -113,6 +120,7 @@ public class BoardService implements IBoardService {
 
 
 
+
     public BoardListResponseDTO getPage(PageDTO dto) {
         Pageable pageable = PageRequest.of(dto.getPage() - 1, dto.getSize(), Sort.by("createDate").descending());
         Page<Board> boards = boardRepository.findAll(pageable);
@@ -161,5 +169,8 @@ public class BoardService implements IBoardService {
         // 수정된 게시글 저장
         boardRepository.save(board);
     }
+
+
+
 
 }

@@ -10,10 +10,14 @@ public class PageDTO {
 
     private int page;
     private int size;
+    private String category;
+    private String condition;
 
     public PageDTO() {
         this.page = 1;
         this.size = 20;
+        this.category = "all";
+        this.condition = "all";
     }
 
 }
