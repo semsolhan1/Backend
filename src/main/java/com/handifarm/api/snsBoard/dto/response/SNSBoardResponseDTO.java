@@ -10,7 +10,7 @@ import java.util.List;
 @ToString @EqualsAndHashCode
 @NoArgsConstructor @AllArgsConstructor
 @Builder
-public class SNSBoardDetailResponseDTO {
+public class SNSBoardResponseDTO {
 
     private String content;
     private String writer;
@@ -20,5 +20,7 @@ public class SNSBoardDetailResponseDTO {
     private LocalDateTime regDate;
     private List<SNSReplyResponseDTO> replyList;
     private long likeCount;
+
+
 
 }

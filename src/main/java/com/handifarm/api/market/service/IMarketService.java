@@ -16,13 +16,18 @@ public interface IMarketService {
     MarketItemListResponseDTO getItemList(PageDTO pageDTO);
 
     // 판매 게시글 등록
-    MarketItemResponseDTO registItem(TokenUserInfo userInfo, MarketItemCreateRequestDTO requestDTO, List<MultipartFile> itemImgs);
+    MarketItemResponseDTO registItem(TokenUserInfo userInfo,
+                                     MarketItemCreateRequestDTO requestDTO,
+                                     List<MultipartFile> itemImgs);
 
     // 판매 게시글 조회
     MarketItemResponseDTO getItem(long itemNo);
 
     // 판매 게시글 수정
-    MarketItemResponseDTO modifyItem(TokenUserInfo userInfo, long itemNo, MarketItemModifyRequestDTO requestDTO, List<MultipartFile> itemImgs);
+    MarketItemResponseDTO modifyItem(TokenUserInfo userInfo,
+                                     long itemNo,
+                                     MarketItemModifyRequestDTO requestDTO,
+                                     List<MultipartFile> itemImgs);
 
     // 판매 게시글 삭제
     void deleteItem(TokenUserInfo userInfo, long itemNo);

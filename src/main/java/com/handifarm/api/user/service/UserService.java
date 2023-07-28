@@ -146,9 +146,6 @@ public class UserService implements IUserService {
     public UserInfoResponseDTO userInfoModify(final TokenUserInfo userInfo,
                                               final UserInfoModifyRequestDTO requestDTO,
                                               final MultipartFile profileImg) throws Exception {
-//        if (!userInfo.getUserId().equals(requestDTO.getUserId())) {
-//            throw new RuntimeException("인증이 유효하지 않습니다.");
-//        }
 
         User user = userRepository.findById(userInfo.getUserId()).orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
 

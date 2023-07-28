@@ -13,6 +13,6 @@ public class SNSBoardListResponseDTO {
 
     private int count;
     private PageResponseDTO<?> pageInfo;
-    private List<SNSBoardDetailResponseDTO> snsList;
+    private List<SNSBoardResponseDTO> snsList;
 
 }
