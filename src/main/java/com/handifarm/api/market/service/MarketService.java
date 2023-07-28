@@ -37,6 +37,7 @@ public class MarketService implements IMarketService {
     private final MarketItemRepository marketItemRepository;
     private final ItemImgRepository itemImgRepository;
     private final S3Service s3Service;
+    private final String serviceName = "MARKET";
 
     // 판매 게시글 목록 요청
     @Override
@@ -58,7 +59,7 @@ public class MarketService implements IMarketService {
 
         return MarketItemListResponseDTO.builder()
                 .count(itemResponseDTOList.size())
-                .pageInfo(new PageResponseDTO(marketItems))
+                .pageInfo(new PageResponseDTO<>(marketItems))
                 .marketItems(itemResponseDTOList)
                 .build();
     }
@@ -125,8 +126,8 @@ public class MarketService implements IMarketService {
         // marketItem의 itemImgs에서 삭제된 이미지를 제거합니다.
         marketItem.getItemImgs().removeAll(removedItemImgs);
 
-        // 새로운 이미지를 데이터베이스와 S3 버킷에 추가합니다.
-        addImgsToDBAndS3(itemImgs, marketItem);
+        // 새로운 이미지가 존재할 때만 이미지를 데이터베이스와 S3 버킷에 추가합니다.
+        if (itemImgs != null && !itemImgs.isEmpty()) addImgsToDBAndS3(itemImgs, marketItem);
 
         // 수정된 MarketItem을 데이터베이스에 저장합니다.
         MarketItem savedMarketItem = marketItemRepository.save(marketItem);
@@ -141,14 +142,12 @@ public class MarketService implements IMarketService {
             throw new RuntimeException("게시물 사진이 업로드되지 않았습니다.");
         }
 
-        String serviceName = "MARKET";
-
         List<String> uploadUrls = itemImgs.stream()
                 .map(itemImg -> {
                     try {
                         String uuidFileName = UUID.randomUUID() + "_" + itemImg.getOriginalFilename();
-                        String uploadUrl = s3Service.uploadToS3Bucket(itemImg.getBytes(), uuidFileName, serviceName);
-                        return uploadUrl;
+                        // S3에 업로드 된 URL을 리턴
+                        return s3Service.uploadToS3Bucket(itemImg.getBytes(), uuidFileName, serviceName);
                     } catch (IOException e) {
                         log.error("이미지 업로드에 실패하였습니다.", e);
                         throw new RuntimeException("이미지 업로드에 실패하였습니다.");

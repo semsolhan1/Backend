@@ -120,8 +120,8 @@ public class CboardService {
                     .map(itemImg -> {
                         try {
                             String uuidFileName = UUID.randomUUID() + "_" + itemImg.getOriginalFilename();
-                            String uploadUrl = s3Service.uploadToS3Bucket(itemImg.getBytes(), uuidFileName, SNS);
-                            return uploadUrl;
+                            // S3에 업로드 된 URL을 리턴
+                            return s3Service.uploadToS3Bucket(itemImg.getBytes(), uuidFileName, SNS);
                         } catch (IOException e) {
                             throw new RuntimeException("이미지 업로드에 실패하였습니다.", e);
                         }
@@ -386,8 +386,8 @@ public class CboardService {
                     .map(itemImg -> {
                         try {
                             String uuidFileName = UUID.randomUUID() + "_" + itemImg.getOriginalFilename();
-                            String uploadUrl = s3Service.uploadToS3Bucket(itemImg.getBytes(), uuidFileName, serviceName);
-                            return uploadUrl;
+                            // S3에 업로드 된 URL을 리턴
+                            return s3Service.uploadToS3Bucket(itemImg.getBytes(), uuidFileName, serviceName);
                         } catch (IOException e) {
                             log.error("이미지 업로드에 실패하였습니다.", e);
                             throw new RuntimeException("이미지 업로드에 실패하였습니다.");

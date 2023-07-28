@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,10 +27,10 @@ public class MarketController {
 
     private final MarketService marketService;
 
-    // 판매 게시글 목록 요청
+    // 판매 게시글 목록
     @GetMapping
     public ResponseEntity<?> getList(PageDTO pageDTO) {
-        log.info("판매 게시글 목록 요청!");
+        log.info("판매 게시글 목록 요청! - PageDTO : {}", pageDTO);
         MarketItemListResponseDTO itemList = marketService.getItemList(pageDTO);
         return ResponseEntity.ok().body(itemList);
     }
@@ -37,9 +39,16 @@ public class MarketController {
     @PostMapping
     public ResponseEntity<?> registItem(
             @AuthenticationPrincipal TokenUserInfo userInfo,
-            @RequestPart("marketItem") MarketItemCreateRequestDTO requestDTO,
-            @RequestPart(value = "itemImgs", required = false) List<MultipartFile> itemImgs) {
-        log.info("판매 게시글 등록 요청!");
+            @Validated @RequestPart("marketItem") MarketItemCreateRequestDTO requestDTO,
+            @RequestPart(value = "itemImgs", required = false) List<MultipartFile> itemImgs,
+            BindingResult result) {
+        log.info("판매 게시글 등록 요청! - DTO : {}", requestDTO);
+
+        if (result.hasErrors()) {
+            log.warn(result.toString());
+            return ResponseEntity.badRequest().body(result.getFieldError());
+        }
+
         try {
             MarketItemResponseDTO marketItemResponseDTO = marketService.registItem(userInfo, requestDTO, itemImgs);
             return ResponseEntity.ok().body(marketItemResponseDTO);
@@ -62,10 +71,17 @@ public class MarketController {
     public ResponseEntity<?> modify(
             @AuthenticationPrincipal TokenUserInfo userInfo,
             @PathVariable long itemNo,
-            @RequestPart("itemInfo") MarketItemModifyRequestDTO requestDTO,
-            @RequestPart(value = "itemImgs", required = false) List<MultipartFile> itemImgs
+            @Validated @RequestPart("itemInfo") MarketItemModifyRequestDTO requestDTO,
+            @RequestPart(value = "itemImgs", required = false) List<MultipartFile> itemImgs,
+            BindingResult result
     ) {
-        log.info("{}번 판매 게시글 수정 요청!", itemNo);
+        log.info("{}번 판매 게시글 수정 요청! - DTO : {}", itemNo, requestDTO);
+
+        if (result.hasErrors()) {
+            log.warn(result.toString());
+            return ResponseEntity.badRequest().body(result.getFieldError());
+        }
+
         try {
             MarketItemResponseDTO marketItemResponseDTO = marketService.modifyItem(userInfo, itemNo, requestDTO, itemImgs);
             return ResponseEntity.ok().body(marketItemResponseDTO);

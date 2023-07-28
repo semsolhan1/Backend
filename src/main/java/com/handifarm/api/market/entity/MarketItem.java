@@ -11,7 +11,7 @@ import java.util.List;
 
 @Setter @Getter
 @ToString(exclude = "itemImgs")
-@EqualsAndHashCode()
+@EqualsAndHashCode(of = "itemNo")
 @NoArgsConstructor @AllArgsConstructor
 @Builder
 @Entity

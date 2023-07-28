@@ -9,7 +9,8 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Setter @Getter @ToString
-@EqualsAndHashCode @NoArgsConstructor @AllArgsConstructor
+@EqualsAndHashCode(of = "boardNo")
+@NoArgsConstructor @AllArgsConstructor
 @Builder @Entity
 @Table(name = "tbl_board")
 public class Board {
@@ -45,10 +46,10 @@ public class Board {
         NOTICE,
         FREE,
         INFORMATION
-    };
+    }
   
     public void increaseViews() {
         this.views++;
     }
 
-};
+}

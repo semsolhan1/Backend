@@ -8,7 +8,8 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Setter @Getter @ToString
-@EqualsAndHashCode @NoArgsConstructor @AllArgsConstructor
+@EqualsAndHashCode(of = "replyNo")
+@NoArgsConstructor @AllArgsConstructor
 @Builder @Entity
 @Table(name = "tbl_board_reply")
 public class BoardReply {

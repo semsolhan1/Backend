@@ -8,7 +8,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Setter @Getter
-@ToString @EqualsAndHashCode()
+@ToString @EqualsAndHashCode(of = "resultCode")
 @NoArgsConstructor @AllArgsConstructor
 @Builder
 @Entity

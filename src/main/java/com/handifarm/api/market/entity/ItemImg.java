@@ -6,7 +6,7 @@ import javax.persistence.*;
 
 @Setter @Getter
 @ToString(exclude = "marketItem")
-@EqualsAndHashCode()
+@EqualsAndHashCode(of = "imgNo")
 @NoArgsConstructor @AllArgsConstructor
 @Builder
 @Entity
