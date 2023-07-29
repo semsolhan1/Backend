@@ -10,14 +10,14 @@ import java.time.LocalDateTime;
 @ToString @EqualsAndHashCode
 @NoArgsConstructor @AllArgsConstructor
 @Builder
-public class SNSReplyResponseDTO {
+public class SnsReplyResponseDTO {
 
     private String writer;
     private String reply;
     @JsonFormat(pattern = "yyyy/MM/dd")
     private LocalDateTime regDate;
 
-    public SNSReplyResponseDTO(SnsReply snsReply) {
+    public SnsReplyResponseDTO(SnsReply snsReply) {
         this.writer = snsReply.getUser().getUserNick();
         this.reply = snsReply.getReply();
         this.regDate = snsReply.getReplyTime();

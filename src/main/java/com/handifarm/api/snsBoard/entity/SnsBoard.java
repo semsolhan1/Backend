@@ -1,6 +1,5 @@
 package com.handifarm.api.snsBoard.entity;
 
-import com.handifarm.api.market.entity.ItemImg;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -25,8 +24,8 @@ public class SnsBoard {
     @Column(nullable = false)
     private String content;
 
-    @Column(nullable = false)
-    private String writer;
+    @Column(nullable = false, name = "writer")
+    private String userNick;
 
     @CreationTimestamp
     private LocalDateTime uploadTime;

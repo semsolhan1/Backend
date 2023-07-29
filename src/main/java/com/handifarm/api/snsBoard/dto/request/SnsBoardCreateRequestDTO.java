@@ -4,20 +4,20 @@ import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Getter @Setter
 @ToString @EqualsAndHashCode
 @NoArgsConstructor @AllArgsConstructor
 @Builder
-public class SNSBoardModifyRequestDTO {
+public class SnsBoardCreateRequestDTO {
 
     @NotBlank
     private String content;
 
-    private List<String> snsImgs;
-
-    private List<MultipartFile> newSnsImgs;
+    @NotNull
+    private List<MultipartFile> snsImgs;
 
     private List<String> hashTags;
 

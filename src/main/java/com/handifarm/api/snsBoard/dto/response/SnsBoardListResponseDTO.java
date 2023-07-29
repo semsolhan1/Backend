@@ -9,11 +9,10 @@ import java.util.List;
 @ToString @EqualsAndHashCode
 @NoArgsConstructor @AllArgsConstructor
 @Builder
-public class SNSBoardListResponseDTO {
+public class SnsBoardListResponseDTO {
 
     private int count;
     private PageResponseDTO<?> pageInfo;
-    private List<SNSBoardResponseDTO> snsList;
-    private boolean hasNextPage; // 페이징 처리 정보
+    private List<SnsBoardResponseDTO> snsList;
 
 }
