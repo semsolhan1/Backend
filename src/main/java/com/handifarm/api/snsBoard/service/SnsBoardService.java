@@ -11,6 +11,7 @@ import com.handifarm.api.snsBoard.repository.SnsBoardRepository;
 import com.handifarm.api.snsBoard.repository.SnsHashTagRepository;
 import com.handifarm.api.snsBoard.repository.SnsImgRepository;
 import com.handifarm.api.util.page.PageDTO;
+import com.handifarm.api.util.page.PageResponseDTO;
 import com.handifarm.aws.S3Service;
 import com.handifarm.jwt.TokenUserInfo;
 import lombok.RequiredArgsConstructor;
@@ -43,8 +44,7 @@ public class SnsBoardService implements ISnsBoardService {
 
     // SNS 게시글 목록
     @Override
-    public SNSBoardListResponseDTO getSnsList(final PageDTO pageDTO) {
-
+    public SNSBoardListResponseDTO getSnsList(PageDTO pageDTO) {
         Pageable pageable = PageRequest.of(pageDTO.getPage() - 1,
                 pageDTO.getSize(),
                 Sort.by("uploadTime").descending());
@@ -53,9 +53,19 @@ public class SnsBoardService implements ISnsBoardService {
 
         List<SnsBoard> snsBoardList = snsBoards.getContent();
 
-//        snsBoards.stream().map(SNSBoardResponseDTO::new).collect(Collectors.toList())
+        List<SNSBoardResponseDTO> snsBoardResponseList = snsBoardList.stream()
+                .map(SNSBoardResponseDTO::new)
+                .collect(Collectors.toList());
 
-        return null;
+        PageResponseDTO<SnsBoard> pageResponseDTO = new PageResponseDTO<>(snsBoards);
+
+        SNSBoardListResponseDTO responseDTO = new SNSBoardListResponseDTO();
+        responseDTO.setCount(pageResponseDTO.getTotalCount());
+        responseDTO.setPageInfo(pageResponseDTO);
+        responseDTO.setSnsList(snsBoardResponseList);
+        responseDTO.setHasNextPage(pageResponseDTO.isNext());
+
+        return responseDTO;
     }
 
     // SNS 게시글 조회

@@ -56,17 +56,7 @@ public class BoardService implements IBoardService {
 
 
     public void registBoard(BoardWriteRequestDTO requestDTO, TokenUserInfo userInfo) {
-//        Board.Category category = Board.Category.valueOf(requestDTO.getCategory());
-//        String title = requestDTO.getTitle();
-//        String content = requestDTO.getContent();
-//        String userNick = userInfo.getUserNick();
-//
-//        Board board = Board.builder()
-//                .userNick(userNick)
-//                .category(category)
-//                .title(title)
-//                .content(content)
-//                .build();
+
         Board board = requestDTO.toEntity(userInfo);
 
         boardRepository.save(board);
