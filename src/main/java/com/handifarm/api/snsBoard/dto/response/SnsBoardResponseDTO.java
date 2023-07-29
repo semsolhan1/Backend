@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @ToString @EqualsAndHashCode
 @NoArgsConstructor @AllArgsConstructor
 @Builder
-public class SNSBoardResponseDTO {
+public class SnsBoardResponseDTO {
 
     private String content;
     private String writer;
@@ -23,13 +23,13 @@ public class SNSBoardResponseDTO {
     private List<String> snsImgs;
     @JsonFormat(pattern = "yyyy/MM/dd")
     private LocalDateTime regDate;
-    private List<SNSReplyResponseDTO> replyList;
+    private List<SnsReplyResponseDTO> replyList;
     private long likeCount;
 
     // 엔터티를 DTO로 변환
-    public SNSBoardResponseDTO(SnsBoard snsBoard) {
+    public SnsBoardResponseDTO(SnsBoard snsBoard) {
         this.content = snsBoard.getContent();
-        this.writer = snsBoard.getWriter();
+        this.writer = snsBoard.getUserNick();
         this.hashTags = getHashTagList(snsBoard.getHashTags());
         this.snsImgs = getSnsImgLinks(snsBoard.getSnsImgs());
         this.regDate = snsBoard.getUploadTime();
@@ -51,9 +51,9 @@ public class SNSBoardResponseDTO {
                 .collect(Collectors.toList());
     }
 
-    private List<SNSReplyResponseDTO> getReplys(List<SnsReply> replyList) {
+    private List<SnsReplyResponseDTO> getReplys(List<SnsReply> replyList) {
         return replyList.stream()
-                .map(SNSReplyResponseDTO::new)
+                .map(SnsReplyResponseDTO::new)
                 .collect(Collectors.toList());
     }
 

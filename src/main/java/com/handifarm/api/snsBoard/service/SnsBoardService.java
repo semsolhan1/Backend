@@ -1,9 +1,10 @@
 package com.handifarm.api.snsBoard.service;
 
-import com.handifarm.api.snsBoard.dto.request.SNSBoardCreateRequestDTO;
-import com.handifarm.api.snsBoard.dto.request.SNSBoardModifyRequestDTO;
-import com.handifarm.api.snsBoard.dto.response.SNSBoardListResponseDTO;
-import com.handifarm.api.snsBoard.dto.response.SNSBoardResponseDTO;
+import com.handifarm.api.snsBoard.dto.request.SnsBoardCreateRequestDTO;
+import com.handifarm.api.snsBoard.dto.request.SnsBoardModifyRequestDTO;
+import com.handifarm.api.snsBoard.dto.response.SnsBoardDetailListResponseDTO;
+import com.handifarm.api.snsBoard.dto.response.SnsBoardListResponseDTO;
+import com.handifarm.api.snsBoard.dto.response.SnsBoardResponseDTO;
 import com.handifarm.api.snsBoard.entity.SnsBoard;
 import com.handifarm.api.snsBoard.entity.SnsHashTag;
 import com.handifarm.api.snsBoard.entity.SnsImg;
@@ -25,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -44,7 +44,7 @@ public class SnsBoardService implements ISnsBoardService {
 
     // SNS 게시글 목록
     @Override
-    public SNSBoardListResponseDTO getSnsList(PageDTO pageDTO) {
+    public SnsBoardListResponseDTO getSnsList(PageDTO pageDTO) {
         Pageable pageable = PageRequest.of(pageDTO.getPage() - 1,
                 pageDTO.getSize(),
                 Sort.by("uploadTime").descending());
@@ -53,55 +53,54 @@ public class SnsBoardService implements ISnsBoardService {
 
         List<SnsBoard> snsBoardList = snsBoards.getContent();
 
-        List<SNSBoardResponseDTO> snsBoardResponseList = snsBoardList.stream()
-                .map(SNSBoardResponseDTO::new)
+        List<SnsBoardResponseDTO> snsBoardResponseList = snsBoardList.stream()
+                .map(SnsBoardResponseDTO::new)
                 .collect(Collectors.toList());
 
         PageResponseDTO<SnsBoard> pageResponseDTO = new PageResponseDTO<>(snsBoards);
 
-        SNSBoardListResponseDTO responseDTO = new SNSBoardListResponseDTO();
+        SnsBoardListResponseDTO responseDTO = new SnsBoardListResponseDTO();
         responseDTO.setCount(pageResponseDTO.getTotalCount());
         responseDTO.setPageInfo(pageResponseDTO);
         responseDTO.setSnsList(snsBoardResponseList);
-        responseDTO.setHasNextPage(pageResponseDTO.isNext());
 
         return responseDTO;
     }
 
     // SNS 게시글 조회
     @Override
-    public SNSBoardListResponseDTO getSns(final long snsNo) {
-        return null;
+    public SnsBoardDetailListResponseDTO getSns(final long snsNo, final String userNick) {
+        List<SnsBoard> snsBoards = snsBoardRepository.findAllByUserNick(userNick);
+        List<SnsBoardResponseDTO> snsResponseList = snsBoards.stream()
+                .map(SnsBoardResponseDTO::new)
+                .collect(Collectors.toList());
+
+        return new SnsBoardDetailListResponseDTO(snsNo, snsResponseList);
     }
 
     // SNS 게시글 등록
     @Override
-    public SNSBoardResponseDTO uploadSns(final TokenUserInfo userInfo,
-                                         final SNSBoardCreateRequestDTO requestDTO,
+    public SnsBoardResponseDTO uploadSns(final TokenUserInfo userInfo,
+                                         final SnsBoardCreateRequestDTO requestDTO,
                                          final List<MultipartFile> snsImgs) {
-
         // SNS 게시판은 사진이 필수 값이므로 검증 -> 컨트롤러에서 필수 값 처리
 //        if (snsImgs == null || snsImgs.isEmpty()) {
 //            throw new RuntimeException("게시물 사진이 업로드되지 않았습니다.");
 //        }
 
         SnsBoard snsBoard = SnsBoard.builder()
-                .writer(userInfo.getUserNick())
+                .userNick(userInfo.getUserNick())
                 .content(requestDTO.getContent())
                 .build();
 
         SnsBoard save = snsBoardRepository.save(snsBoard);
 
         List<String> hashTags = requestDTO.getHashTags();
-        // DB에 등록 성공한 값을 담아서 ResponseDTO에 넘겨줄 List
-        List<String> savedhashTags = new ArrayList<>();
 
         for (String hashTag : hashTags) {
             SnsHashTag snsHashTag = hashTagRepository.save(SnsHashTag.builder().hashTag(hashTag).build());
             // 데이터 일치를 위해 엔티티에도 편의 메서드로 추가
             snsBoard.addHashTag(snsHashTag);
-
-            savedhashTags.add(snsHashTag.getHashTag());
         }
 
         // S3에 이미지 업로드
@@ -127,14 +126,14 @@ public class SnsBoardService implements ISnsBoardService {
             snsBoard.addSnsImg(savedSnsImg);
         });
 
-        return new SNSBoardResponseDTO(snsBoard);
+        return new SnsBoardResponseDTO(snsBoard);
     }
 
     // SNS 게시글 수정
     @Override
-    public SNSBoardResponseDTO modifySns(final TokenUserInfo userInfo,
+    public SnsBoardResponseDTO modifySns(final TokenUserInfo userInfo,
                                          final long snsNo,
-                                         final SNSBoardModifyRequestDTO requestDTO,
+                                         final SnsBoardModifyRequestDTO requestDTO,
                                          final List<MultipartFile> snsImgs) {
         return null;
     }

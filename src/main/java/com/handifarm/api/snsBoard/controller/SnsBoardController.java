@@ -1,14 +1,13 @@
 package com.handifarm.api.snsBoard.controller;
 
-import com.handifarm.api.board.dto.response.BoardListResponseDTO;
-import com.handifarm.api.snsBoard.dto.request.SNSBoardCreateRequestDTO;
-import com.handifarm.api.snsBoard.dto.request.SNSBoardModifyRequestDTO;
-import com.handifarm.api.snsBoard.dto.response.SNSBoardListResponseDTO;
-import com.handifarm.api.snsBoard.dto.response.SNSBoardResponseDTO;
+import com.handifarm.api.snsBoard.dto.request.SnsBoardCreateRequestDTO;
+import com.handifarm.api.snsBoard.dto.request.SnsBoardModifyRequestDTO;
+import com.handifarm.api.snsBoard.dto.response.SnsBoardDetailListResponseDTO;
+import com.handifarm.api.snsBoard.dto.response.SnsBoardListResponseDTO;
+import com.handifarm.api.snsBoard.dto.response.SnsBoardResponseDTO;
 import com.handifarm.api.snsBoard.service.SnsBoardService;
 import com.handifarm.api.util.page.PageDTO;
 import com.handifarm.jwt.TokenUserInfo;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +15,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RestController
 @Slf4j
@@ -36,26 +32,33 @@ public class SnsBoardController {
     @GetMapping
     public ResponseEntity<?> getSnsList(PageDTO pageDTO) {
         log.info("SNS 게시글 목록 요청! - PageDTO : {}", pageDTO);
-        SNSBoardListResponseDTO snsList = snsBoardService.getSnsList(pageDTO);
+        SnsBoardListResponseDTO snsList = snsBoardService.getSnsList(pageDTO);
         return ResponseEntity.ok(snsList);
     }
 
 
     // SNS 게시글 조회
     @GetMapping("/{snsNo}")
-    public ResponseEntity<?> getSns(@PathVariable long snsNo) {
-        log.info("{}번 SNS 게시글 조회 요청!", snsNo);
+    public ResponseEntity<?> getSns(@PathVariable long snsNo, String userNick) {
+        log.info("{}번 SNS 게시글 조회 요청! - 해당 게시글의 유저 : {}", snsNo, userNick);
 
-        return null;
+        try {
+            SnsBoardDetailListResponseDTO responseDTO = snsBoardService.getSns(snsNo, userNick);
+            return ResponseEntity.ok().body(responseDTO);
+        } catch (Exception e) {
+            log.error("SNS 게시글 등록 중 오류 발생", e);
+            return ResponseEntity.badRequest().body("SNS 게시글 등록 중 오류 발생 : " + e.getMessage());
+        }
+
     }
 
     // SNS 게시글 등록
     @PostMapping
     public ResponseEntity<?> uploadSns(
             @AuthenticationPrincipal TokenUserInfo userInfo,
-//            @Validated @RequestPart("snsContent") SNSBoardCreateRequestDTO dto,
+//            @Validated @RequestPart("snsContent") SnsBoardCreateRequestDTO dto,
 //            @RequestPart(value = "snsImgs")List<MultipartFile> snsImgs,
-            @Validated SNSBoardCreateRequestDTO dto,
+            @Validated SnsBoardCreateRequestDTO dto,
             BindingResult result
             ) {
         log.info("SNS 게시글 등록 요청! - DTO : {}", dto);
@@ -66,7 +69,7 @@ public class SnsBoardController {
         }
 
         try {
-            SNSBoardResponseDTO snsBoardResponseDTO = snsBoardService.uploadSns(userInfo, dto, dto.getSnsImgs());
+            SnsBoardResponseDTO snsBoardResponseDTO = snsBoardService.uploadSns(userInfo, dto, dto.getSnsImgs());
             return ResponseEntity.ok().body(snsBoardResponseDTO);
         } catch (Exception e) {
             log.error("SNS 게시글 등록 중 오류 발생", e);
@@ -79,7 +82,7 @@ public class SnsBoardController {
     public ResponseEntity<?> modifySns(
             @AuthenticationPrincipal TokenUserInfo userInfo,
             @PathVariable long snsNo,
-            @Validated SNSBoardModifyRequestDTO dto,
+            @Validated SnsBoardModifyRequestDTO dto,
             BindingResult result
     ) {
         log.info("{}번 SNS 게시글 수정 요청! - DTO : {}", snsNo, dto);
