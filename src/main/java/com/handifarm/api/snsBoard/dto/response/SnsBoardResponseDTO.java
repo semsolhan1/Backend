@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 @Builder
 public class SnsBoardResponseDTO {
 
+    private Long snsNo;
     private String content;
     private String writer;
     private List<String> hashTags;
@@ -28,6 +29,7 @@ public class SnsBoardResponseDTO {
 
     // 엔터티를 DTO로 변환
     public SnsBoardResponseDTO(SnsBoard snsBoard) {
+        this.snsNo = snsBoard.getSnsNo();
         this.content = snsBoard.getContent();
         this.writer = snsBoard.getUserNick();
         this.hashTags = getHashTagList(snsBoard.getHashTags());
