@@ -68,7 +68,6 @@ public class SnsBoardService implements ISnsBoardService {
     }
 
     // SNS 게시글 조회
-    @Override
     public SnsBoardDetailListResponseDTO getSns(final long snsNo, final String userNick) {
         List<SnsBoard> snsBoards = snsBoardRepository.findAllByUserNick(userNick);
         List<SnsBoardResponseDTO> snsResponseList = snsBoards.stream()
@@ -79,10 +78,10 @@ public class SnsBoardService implements ISnsBoardService {
     }
 
     // SNS 게시글 등록
+//    @Async
     @Override
     public SnsBoardResponseDTO uploadSns(final TokenUserInfo userInfo,
-                                         final SnsBoardCreateRequestDTO requestDTO,
-                                         final List<MultipartFile> snsImgs) {
+                                         final SnsBoardCreateRequestDTO requestDTO) {
         // SNS 게시판은 사진이 필수 값이므로 검증 -> 컨트롤러에서 필수 값 처리
 //        if (snsImgs == null || snsImgs.isEmpty()) {
 //            throw new RuntimeException("게시물 사진이 업로드되지 않았습니다.");
@@ -96,6 +95,7 @@ public class SnsBoardService implements ISnsBoardService {
         SnsBoard save = snsBoardRepository.save(snsBoard);
 
         List<String> hashTags = requestDTO.getHashTags();
+        List<MultipartFile> snsImgs = requestDTO.getSnsImgs();
 
         for (String hashTag : hashTags) {
             SnsHashTag snsHashTag = hashTagRepository.save(SnsHashTag.builder().hashTag(hashTag).build());
@@ -103,6 +103,16 @@ public class SnsBoardService implements ISnsBoardService {
             snsBoard.addHashTag(snsHashTag);
         }
 
+//        // 비동기로 이미지 업로드 처리
+//        List<ListenableFuture<String>> uploadFutures = snsImgs.stream()
+//                .map(snsImg -> uploadImageAsync(snsImg, serviceName))
+//                .collect(Collectors.toList());
+//
+//        // 비동기 업로드 작업이 모두 완료될 때까지 대기
+//        List<String> uploadUrls = uploadFutures.stream()
+//                .map(ListenableFuture::completable)
+//                .map(CompletableFuture::join)
+//                .collect(Collectors.toList());
         // S3에 이미지 업로드
         List<String> uploadUrls = snsImgs.stream()
                 .map(snsImg -> {
@@ -133,14 +143,84 @@ public class SnsBoardService implements ISnsBoardService {
     @Override
     public SnsBoardResponseDTO modifySns(final TokenUserInfo userInfo,
                                          final long snsNo,
-                                         final SnsBoardModifyRequestDTO requestDTO,
-                                         final List<MultipartFile> snsImgs) {
-        return null;
+                                         final SnsBoardModifyRequestDTO requestDTO) {
+        SnsBoard snsBoard = snsBoardRepository.findById(snsNo)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 SNS 게시글 번호입니다."));
+
+        if (!userInfo.getUserNick().equals(snsBoard.getUserNick())) throw new RuntimeException("권한이 없습니다.");
+
+        snsBoard.setContent(requestDTO.getContent());
+
+        List<String> existingHashTags = snsBoard.getExistingHashTags();
+        List<String> newHashTags = requestDTO.getHashTags().stream()
+                .filter(hashTag -> !existingHashTags.contains(hashTag))
+                .collect(Collectors.toList());
+
+        for (String newHashTag : newHashTags) {
+            SnsHashTag snsHashTag = hashTagRepository.save(SnsHashTag.builder()
+                    .hashTag(newHashTag)
+                    .snsBoard(snsBoard)
+                    .build());
+            snsBoard.addHashTag(snsHashTag);
+        }
+
+        List<SnsHashTag> hashTagsToRemove = snsBoard.getHashTags().stream()
+                .filter(hashTag -> !requestDTO.getHashTags().contains(hashTag.getHashTag()))
+                .collect(Collectors.toList());
+
+        for (SnsHashTag hashTag : hashTagsToRemove) {
+            hashTagRepository.delete(hashTag); // DB에서 제거
+            snsBoard.removeHashTag(hashTag); // 엔티티에서 제거
+        }
+
+        SnsBoard savedSnsBoard = snsBoardRepository.save(snsBoard);
+
+        return new SnsBoardResponseDTO(savedSnsBoard);
     }
+
+//    @Async
+//    protected ListenableFuture<String> uploadImageAsync(final MultipartFile snsImg, final String serviceName) {
+//        try {
+//            // 임시 디렉토리 설정
+//            String tempDirectoryPath = "C:/work/asyncTemp";
+//            System.setProperty("java.io.tmpdir", tempDirectoryPath);
+//
+//            // 임시 디렉토리가 존재하지 않으면 생성
+//            Path tempDirectory = Paths.get(tempDirectoryPath);
+//            if (!Files.exists(tempDirectory)) {
+//                Files.createDirectories(tempDirectory);
+//            }
+//
+//            // 파일 저장할 경로 생성
+//            String uuidFileName = UUID.randomUUID() + "_" + snsImg.getOriginalFilename();
+//            String filePath = tempDirectoryPath + "/" + uuidFileName;
+//            byte[] imageData = snsImg.getBytes();
+//
+//            // 이미지 파일을 생성된 경로에 저장
+//            Files.write(Paths.get(filePath), imageData);
+//
+//            // S3에 업로드 된 URL을 리턴
+//            return new AsyncResult<>(s3Service.uploadToS3Bucket(imageData, uuidFileName, serviceName));
+//        } catch (IOException e) {
+//            log.error("이미지 업로드에 실패하였습니다.", e);
+//            throw new RuntimeException("이미지 업로드에 실패하였습니다.");
+//        }
+//    }
 
     // SNS 게시글 삭제
     @Override
     public void deleteSns(final TokenUserInfo userInfo, final long snsNo) {
+        SnsBoard snsBoard = snsBoardRepository.findById(snsNo)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 SNS 게시글 번호입니다."));
 
+        if (!userInfo.getUserNick().equals(snsBoard.getUserNick())) throw new RuntimeException("권한이 없습니다.");
+
+        // S3 버킷에 업로드 된 이미지 먼저 삭제
+        snsBoard.getSnsImgs().stream()
+                .map(SnsImg::getSnsImgLink)
+                .forEach(s3Service::deleteFromS3Bucket);
+
+        // 게시글 삭제
+        snsBoardRepository.delete(snsBoard);
     }
 }

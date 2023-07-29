@@ -8,8 +8,8 @@ import com.handifarm.api.snsBoard.dto.response.SnsBoardResponseDTO;
 import com.handifarm.api.snsBoard.service.SnsBoardService;
 import com.handifarm.api.util.page.PageDTO;
 import com.handifarm.jwt.TokenUserInfo;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
@@ -18,15 +18,11 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Slf4j
+@RequiredArgsConstructor
 @RequestMapping("/api/sns")
 public class SnsBoardController {
 
     private final SnsBoardService snsBoardService;
-
-    @Autowired
-    public SnsBoardController(SnsBoardService snsBoardService) {
-        this.snsBoardService = snsBoardService;
-    }
 
     // SNS 게시글 목록
     @GetMapping
@@ -40,7 +36,7 @@ public class SnsBoardController {
     // SNS 게시글 조회
     @GetMapping("/{snsNo}")
     public ResponseEntity<?> getSns(@PathVariable long snsNo, String userNick) {
-        log.info("{}번 SNS 게시글 조회 요청! - 해당 게시글의 유저 : {}", snsNo, userNick);
+        log.info("{}번 SNS 게시글 조회 요청! - 해당 게시글의 작성자 : {}", snsNo, userNick);
 
         try {
             SnsBoardDetailListResponseDTO responseDTO = snsBoardService.getSns(snsNo, userNick);
@@ -54,11 +50,12 @@ public class SnsBoardController {
 
     // SNS 게시글 등록
     @PostMapping
+//    @Async
     public ResponseEntity<?> uploadSns(
             @AuthenticationPrincipal TokenUserInfo userInfo,
 //            @Validated @RequestPart("snsContent") SnsBoardCreateRequestDTO dto,
 //            @RequestPart(value = "snsImgs")List<MultipartFile> snsImgs,
-            @Validated SnsBoardCreateRequestDTO dto,
+            @Validated @RequestBody SnsBoardCreateRequestDTO dto,
             BindingResult result
             ) {
         log.info("SNS 게시글 등록 요청! - DTO : {}", dto);
@@ -69,7 +66,7 @@ public class SnsBoardController {
         }
 
         try {
-            SnsBoardResponseDTO snsBoardResponseDTO = snsBoardService.uploadSns(userInfo, dto, dto.getSnsImgs());
+            SnsBoardResponseDTO snsBoardResponseDTO = snsBoardService.uploadSns(userInfo, dto);
             return ResponseEntity.ok().body(snsBoardResponseDTO);
         } catch (Exception e) {
             log.error("SNS 게시글 등록 중 오류 발생", e);
@@ -82,7 +79,7 @@ public class SnsBoardController {
     public ResponseEntity<?> modifySns(
             @AuthenticationPrincipal TokenUserInfo userInfo,
             @PathVariable long snsNo,
-            @Validated SnsBoardModifyRequestDTO dto,
+            @Validated @RequestBody SnsBoardModifyRequestDTO dto,
             BindingResult result
     ) {
         log.info("{}번 SNS 게시글 수정 요청! - DTO : {}", snsNo, dto);
@@ -92,7 +89,13 @@ public class SnsBoardController {
             return ResponseEntity.badRequest().body(result.getFieldError());
         }
 
-        return null;
+        try {
+            SnsBoardResponseDTO snsBoardResponseDTO = snsBoardService.modifySns(userInfo, snsNo, dto);
+            return ResponseEntity.ok().body(snsBoardResponseDTO);
+        } catch (Exception e) {
+            log.error("SNS 게시글 수정 중 오류 발생", e);
+            return ResponseEntity.badRequest().body("SNS 게시글 수정 중 오류 발생 : " + e.getMessage());
+        }
     }
 
     // SNS 게시글 삭제
@@ -102,9 +105,13 @@ public class SnsBoardController {
             @PathVariable long snsNo) {
         log.info("{}번 SNS 게시글 삭제 요청!", snsNo);
 
-
-
-        return null;
+        try {
+            snsBoardService.deleteSns(userInfo, snsNo);
+            return ResponseEntity.ok().body(snsNo + "번 게시글 삭제 성공!");
+        } catch (Exception e) {
+            log.error("SNS 게시글 삭제 중 오류 발생", e);
+            return ResponseEntity.badRequest().body("SNS 게시글 삭제 중 오류 발생 : " + e.getMessage());
+        }
     }
 
 }

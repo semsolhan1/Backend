@@ -7,6 +7,7 @@ import com.handifarm.api.snsBoard.dto.response.SnsBoardListResponseDTO;
 import com.handifarm.api.snsBoard.dto.response.SnsBoardResponseDTO;
 import com.handifarm.api.util.page.PageDTO;
 import com.handifarm.jwt.TokenUserInfo;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -20,15 +21,10 @@ public interface ISnsBoardService {
     SnsBoardDetailListResponseDTO getSns(long snsNo, String userNick);
 
     // SNS 게시글 등록
-    SnsBoardResponseDTO uploadSns(TokenUserInfo userInfo,
-                                  SnsBoardCreateRequestDTO requestDTO,
-                                  List<MultipartFile> snsImgs);
+    SnsBoardResponseDTO uploadSns(TokenUserInfo userInfo, SnsBoardCreateRequestDTO requestDTO);
 
     // SNS 게시글 수정
-    SnsBoardResponseDTO modifySns(TokenUserInfo userInfo,
-                                  long snsNo,
-                                  SnsBoardModifyRequestDTO requestDTO,
-                                  List<MultipartFile> snsImgs);
+    SnsBoardResponseDTO modifySns(TokenUserInfo userInfo, long snsNo, SnsBoardModifyRequestDTO requestDTO);
 
     // SNS 게시글 삭제
     void deleteSns(TokenUserInfo userInfo, long snsNo);
