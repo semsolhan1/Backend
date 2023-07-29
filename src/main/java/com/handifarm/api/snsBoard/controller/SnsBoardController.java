@@ -1,13 +1,16 @@
 package com.handifarm.api.snsBoard.controller;
 
+import com.handifarm.api.board.dto.response.BoardListResponseDTO;
 import com.handifarm.api.snsBoard.dto.request.SNSBoardCreateRequestDTO;
 import com.handifarm.api.snsBoard.dto.request.SNSBoardModifyRequestDTO;
+import com.handifarm.api.snsBoard.dto.response.SNSBoardListResponseDTO;
 import com.handifarm.api.snsBoard.dto.response.SNSBoardResponseDTO;
 import com.handifarm.api.snsBoard.service.SnsBoardService;
 import com.handifarm.api.util.page.PageDTO;
 import com.handifarm.jwt.TokenUserInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
@@ -19,19 +22,24 @@ import java.util.List;
 
 @RestController
 @Slf4j
-@RequiredArgsConstructor
 @RequestMapping("/api/sns")
 public class SnsBoardController {
 
     private final SnsBoardService snsBoardService;
 
+    @Autowired
+    public SnsBoardController(SnsBoardService snsBoardService) {
+        this.snsBoardService = snsBoardService;
+    }
+
     // SNS 게시글 목록
     @GetMapping
     public ResponseEntity<?> getSnsList(PageDTO pageDTO) {
         log.info("SNS 게시글 목록 요청! - PageDTO : {}", pageDTO);
-
-        return null;
+        SNSBoardListResponseDTO snsList = snsBoardService.getSnsList(pageDTO);
+        return ResponseEntity.ok(snsList);
     }
+
 
     // SNS 게시글 조회
     @GetMapping("/{snsNo}")

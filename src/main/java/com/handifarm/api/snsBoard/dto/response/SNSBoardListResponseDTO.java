@@ -1,6 +1,6 @@
 package com.handifarm.api.snsBoard.dto.response;
 
-import com.handifarm.cboard.dto.page.PageResponseDTO;
+import com.handifarm.api.util.page.PageResponseDTO;
 import lombok.*;
 
 import java.util.List;
@@ -14,5 +14,6 @@ public class SNSBoardListResponseDTO {
     private int count;
     private PageResponseDTO<?> pageInfo;
     private List<SNSBoardResponseDTO> snsList;
+    private boolean hasNextPage; // 페이징 처리 정보
 
 }
