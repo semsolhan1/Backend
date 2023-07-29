@@ -15,9 +15,9 @@ public class SnsBoardModifyRequestDTO {
     @NotBlank
     private String content;
 
-    private List<String> snsImgs;
+//    private List<String> snsImgs;
 
-    private List<MultipartFile> newSnsImgs;
+//    private List<MultipartFile> newSnsImgs;
 
     private List<String> hashTags;
 

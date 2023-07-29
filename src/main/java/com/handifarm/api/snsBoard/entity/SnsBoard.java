@@ -7,6 +7,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter @Setter
 @ToString()
@@ -59,6 +60,21 @@ public class SnsBoard {
         hashTags.add(hashTag);
         if(this != hashTag.getSnsBoard()) {
             hashTag.setSnsBoard(this);
+        }
+    }
+
+    // 기존의 HashTag들을 가져오는 메서드
+    public List<String> getExistingHashTags() {
+        return this.hashTags.stream()
+                .map(SnsHashTag::getHashTag)
+                .collect(Collectors.toList());
+    }
+
+    // SNS HashTag 삭제 편의 메서드
+    public void removeHashTag(SnsHashTag hashTag) {
+        hashTags.remove(hashTag);
+        if (hashTag.getSnsBoard() == this) {
+            hashTag.setSnsBoard(null);
         }
     }
 

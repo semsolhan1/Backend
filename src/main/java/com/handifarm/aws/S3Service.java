@@ -86,10 +86,14 @@ public class S3Service {
 
         log.info("bucketName : {}, key : {}", bucketName, key);
 
-        // 파일 삭제 요청 생성
-        s3.deleteObject(builder -> builder.bucket(bucketName).key(key));
-
-        log.info("File deleted successfully: {}", fileLink);
+        try {
+            // 파일 삭제 요청 생성
+            s3.deleteObject(builder -> builder.bucket(bucketName).key(key));
+            log.info("File deleted successfully: {}", fileLink);
+        } catch (Exception e) {
+            log.error("Error deleting file from S3: {}", fileLink, e);
+            throw new RuntimeException("이미지 삭제 중 오류가 발생했습니다.");
+        }
     }
 
     // serviceName에 따라 다른 버킷 이름 반환
