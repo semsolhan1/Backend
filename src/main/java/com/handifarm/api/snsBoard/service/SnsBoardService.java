@@ -42,7 +42,7 @@ public class SnsBoardService implements ISnsBoardService {
     private final S3Service s3Service;
     private final String serviceName = "SNS";
 
-    // SNS 게시글 목록
+    // SNS 전체 게시글 목록
     @Override
     public SnsBoardListResponseDTO getSnsList(PageDTO pageDTO) {
         Pageable pageable = PageRequest.of(pageDTO.getPage() - 1,
@@ -67,8 +67,9 @@ public class SnsBoardService implements ISnsBoardService {
         return responseDTO;
     }
 
-    // SNS 게시글 조회
-    public SnsBoardDetailListResponseDTO getSns(final long snsNo, final String userNick) {
+    // SNS 유저 게시글 목록
+    @Override
+    public SnsBoardDetailListResponseDTO getSnsUserList(final long snsNo, final String userNick) {
         List<SnsBoard> snsBoards = snsBoardRepository.findAllByUserNick(userNick);
         List<SnsBoardResponseDTO> snsResponseList = snsBoards.stream()
                 .map(SnsBoardResponseDTO::new)
@@ -92,7 +93,7 @@ public class SnsBoardService implements ISnsBoardService {
                 .content(requestDTO.getContent())
                 .build();
 
-        SnsBoard save = snsBoardRepository.save(snsBoard);
+        SnsBoard savedSnsBoard = snsBoardRepository.save(snsBoard);
 
         List<String> hashTags = requestDTO.getHashTags();
         List<MultipartFile> snsImgs = requestDTO.getSnsImgs();
@@ -136,7 +137,7 @@ public class SnsBoardService implements ISnsBoardService {
             snsBoard.addSnsImg(savedSnsImg);
         });
 
-        return new SnsBoardResponseDTO(snsBoard);
+        return new SnsBoardResponseDTO(savedSnsBoard);
     }
 
     // SNS 게시글 수정

@@ -7,18 +7,14 @@ import com.handifarm.api.snsBoard.dto.response.SnsBoardListResponseDTO;
 import com.handifarm.api.snsBoard.dto.response.SnsBoardResponseDTO;
 import com.handifarm.api.util.page.PageDTO;
 import com.handifarm.jwt.TokenUserInfo;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 public interface ISnsBoardService {
 
-    // SNS 게시글 목록
+    // SNS 전체 게시글 목록
     SnsBoardListResponseDTO getSnsList(PageDTO pageDTO);
 
-    // SNS 게시글 조회
-    SnsBoardDetailListResponseDTO getSns(long snsNo, String userNick);
+    // SNS 유저 게시글 목록
+    SnsBoardDetailListResponseDTO getSnsUserList(long snsNo, String userNick);
 
     // SNS 게시글 등록
     SnsBoardResponseDTO uploadSns(TokenUserInfo userInfo, SnsBoardCreateRequestDTO requestDTO);

@@ -24,7 +24,7 @@ public class SnsBoardController {
 
     private final SnsBoardService snsBoardService;
 
-    // SNS 게시글 목록
+    // SNS 전체 게시글 목록
     @GetMapping
     public ResponseEntity<?> getSnsList(PageDTO pageDTO) {
         log.info("SNS 게시글 목록 요청! - PageDTO : {}", pageDTO);
@@ -33,13 +33,15 @@ public class SnsBoardController {
     }
 
 
-    // SNS 게시글 조회
+    // SNS 유저 게시글 목록
     @GetMapping("/{snsNo}")
-    public ResponseEntity<?> getSns(@PathVariable long snsNo, String userNick) {
+    public ResponseEntity<?> getSns(@PathVariable(required = false) Long snsNo, String userNick) {
         log.info("{}번 SNS 게시글 조회 요청! - 해당 게시글의 작성자 : {}", snsNo, userNick);
 
+        if (snsNo == null) snsNo = 0L;
+
         try {
-            SnsBoardDetailListResponseDTO responseDTO = snsBoardService.getSns(snsNo, userNick);
+            SnsBoardDetailListResponseDTO responseDTO = snsBoardService.getSnsUserList(snsNo, userNick);
             return ResponseEntity.ok().body(responseDTO);
         } catch (Exception e) {
             log.error("SNS 게시글 등록 중 오류 발생", e);
