@@ -25,6 +25,7 @@ public class SnsBoardResponseDTO {
     @JsonFormat(pattern = "yyyy/MM/dd")
     private LocalDateTime regDate;
     private List<SnsReplyResponseDTO> replyList;
+    private boolean likeCheck;
     private long likeCount;
 
     // 엔터티를 DTO로 변환
@@ -36,6 +37,10 @@ public class SnsBoardResponseDTO {
         this.snsImgs = getSnsImgLinks(snsBoard.getSnsImgs());
         this.regDate = snsBoard.getUploadTime();
         this.replyList = getReplys(snsBoard.getReplyList());
+        // 좋아요 여부를 설정
+        this.likeCheck = snsBoard.getLikes().stream()
+                // 좋아요한 유저와 작성자가 같은지 확인
+                .anyMatch(like -> like.getUser().getUserNick().equals(this.writer));
         // 엔티티에 존재하는 like의 크기를 반환 (좋아요 수 계산)
         this.likeCount = snsBoard.getLikes().size();
     }

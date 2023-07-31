@@ -151,7 +151,7 @@ public class UserService implements IUserService {
 
         if (profileImg != null && !profileImg.isEmpty()) {
             // 프로필 이미지가 변경되면 기존 이미지는 삭제
-            log.info("프로필 이미지가 변경되면 기존 이미지는 삭제");
+            log.info("프로필 이미지 변경으로 기존 이미지 삭제 - 기존 이미지 링크 : {}", profileImg);
             s3Service.deleteFromS3Bucket(user.getUserProfileImg());
 
             String uuidFileName = UUID.randomUUID() + "_" + profileImg.getOriginalFilename();

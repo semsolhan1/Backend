@@ -1,6 +1,5 @@
 package com.handifarm.api.snsBoard.entity;
 
-import com.handifarm.api.user.entity.User;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -24,15 +23,14 @@ public class SnsReply {
     @Column(name = "sns_reply", nullable = false)
     private String reply;
 
+    @Column(name = "sns_reply_writer")
+    private String writer;
+
     @CreationTimestamp
     private LocalDateTime replyTime;
 
     @ManyToOne
     @JoinColumn(name = "snsNo")
     private SnsBoard snsBoard;
-
-    @ManyToOne
-    @JoinColumn(name = "sns_reply_writer", referencedColumnName = "userNick")
-    private User user;
 
 }

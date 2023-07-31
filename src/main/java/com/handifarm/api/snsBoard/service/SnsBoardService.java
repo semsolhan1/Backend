@@ -5,12 +5,10 @@ import com.handifarm.api.snsBoard.dto.request.SnsBoardModifyRequestDTO;
 import com.handifarm.api.snsBoard.dto.response.SnsBoardDetailListResponseDTO;
 import com.handifarm.api.snsBoard.dto.response.SnsBoardListResponseDTO;
 import com.handifarm.api.snsBoard.dto.response.SnsBoardResponseDTO;
-import com.handifarm.api.snsBoard.entity.SnsBoard;
-import com.handifarm.api.snsBoard.entity.SnsHashTag;
-import com.handifarm.api.snsBoard.entity.SnsImg;
-import com.handifarm.api.snsBoard.repository.SnsBoardRepository;
-import com.handifarm.api.snsBoard.repository.SnsHashTagRepository;
-import com.handifarm.api.snsBoard.repository.SnsImgRepository;
+import com.handifarm.api.snsBoard.entity.*;
+import com.handifarm.api.snsBoard.repository.*;
+import com.handifarm.api.user.entity.User;
+import com.handifarm.api.user.repository.UserRepository;
 import com.handifarm.api.util.page.PageDTO;
 import com.handifarm.api.util.page.PageResponseDTO;
 import com.handifarm.aws.S3Service;
@@ -36,9 +34,12 @@ import java.util.stream.Collectors;
 @Transactional
 public class SnsBoardService implements ISnsBoardService {
 
+    private final UserRepository userRepository;
     private final SnsBoardRepository snsBoardRepository;
     private final SnsHashTagRepository hashTagRepository;
     private final SnsImgRepository snsImgRepository;
+    private final SnsLikeRepository likeRepository;
+    private final SnsReplyRepository replyRepository;
     private final S3Service s3Service;
     private final String serviceName = "SNS";
 
@@ -70,19 +71,22 @@ public class SnsBoardService implements ISnsBoardService {
     // SNS 유저 게시글 목록
     @Override
     public SnsBoardDetailListResponseDTO getSnsUserList(final long snsNo, final String userNick) {
+        User user = userRepository.findByUserNick(userNick);
+
         List<SnsBoard> snsBoards = snsBoardRepository.findAllByUserNick(userNick);
         List<SnsBoardResponseDTO> snsResponseList = snsBoards.stream()
                 .map(SnsBoardResponseDTO::new)
                 .collect(Collectors.toList());
 
-        return new SnsBoardDetailListResponseDTO(snsNo, snsResponseList);
+        return new SnsBoardDetailListResponseDTO(snsNo, user.getUserProfileImg(),snsResponseList);
     }
 
     // SNS 게시글 등록
 //    @Async
     @Override
     public SnsBoardResponseDTO uploadSns(final TokenUserInfo userInfo,
-                                         final SnsBoardCreateRequestDTO requestDTO) {
+                                         final SnsBoardCreateRequestDTO requestDTO,
+                                         final List<MultipartFile> snsImgs) {
         // SNS 게시판은 사진이 필수 값이므로 검증 -> 컨트롤러에서 필수 값 처리
 //        if (snsImgs == null || snsImgs.isEmpty()) {
 //            throw new RuntimeException("게시물 사진이 업로드되지 않았습니다.");
@@ -96,7 +100,6 @@ public class SnsBoardService implements ISnsBoardService {
         SnsBoard savedSnsBoard = snsBoardRepository.save(snsBoard);
 
         List<String> hashTags = requestDTO.getHashTags();
-        List<MultipartFile> snsImgs = requestDTO.getSnsImgs();
 
         for (String hashTag : hashTags) {
             SnsHashTag snsHashTag = hashTagRepository.save(SnsHashTag.builder().hashTag(hashTag).build());
@@ -224,4 +227,98 @@ public class SnsBoardService implements ISnsBoardService {
         // 게시글 삭제
         snsBoardRepository.delete(snsBoard);
     }
+
+    // SNS 게시글 댓글 등록
+    @Override
+    public SnsBoardDetailListResponseDTO registReply(final TokenUserInfo userInfo, final long snsNo, final String reply) {
+        SnsBoard snsBoard = snsBoardRepository.findById(snsNo)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 SNS 게시글 번호입니다."));
+
+        replyRepository.save(SnsReply.builder().reply(reply).snsBoard(snsBoard).writer(userInfo.getUserNick()).build());
+
+        User user = userRepository.findByUserNick(snsBoard.getUserNick()); // 댓글 게시글의 User
+
+        List<SnsBoard> snsBoards = snsBoardRepository.findAllByUserNick(snsBoard.getUserNick());
+
+        List<SnsBoardResponseDTO> snsResponseList = snsBoards.stream()
+                .map(SnsBoardResponseDTO::new)
+                .collect(Collectors.toList());
+
+        return new SnsBoardDetailListResponseDTO(snsNo, user.getUserProfileImg(), snsResponseList);
+    }
+
+    // SNS 게시글 댓글 수정
+    @Override
+    public SnsBoardDetailListResponseDTO modifyReply(final TokenUserInfo userInfo, final long snsNo,
+                                                     final long replyNo, final String reply) {
+        SnsReply snsReply = replyRepository.findById(replyNo)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 SNS 댓글 번호입니다."));
+
+        if (!userInfo.getUserNick().equals(snsReply.getWriter())) throw new RuntimeException("권한이 없습니다.");
+
+        User user = userRepository.findByUserNick(snsReply.getSnsBoard().getUserNick()); // 댓글 게시글의 User
+
+        snsReply.setReply(reply);
+        SnsReply savedSnsReply = replyRepository.save(snsReply);
+
+        List<SnsBoard> snsBoards = snsBoardRepository.findAllByUserNick(savedSnsReply.getSnsBoard().getUserNick());
+
+        List<SnsBoardResponseDTO> snsResponseList = snsBoards.stream()
+                .map(SnsBoardResponseDTO::new)
+                .collect(Collectors.toList());
+
+        return new SnsBoardDetailListResponseDTO(snsNo, user.getUserProfileImg(), snsResponseList);
+    }
+
+    // SNS 게시글 댓글 삭제
+    @Override
+    public SnsBoardDetailListResponseDTO deleteReply(final TokenUserInfo userInfo, final long snsNo, final long replyNo) {
+        SnsReply snsReply = replyRepository.findById(replyNo)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 SNS 댓글 번호입니다."));
+
+        if (!userInfo.getUserNick().equals(snsReply.getWriter())) throw new RuntimeException("권한이 없습니다.");
+
+        User user = userRepository.findByUserNick(snsReply.getSnsBoard().getUserNick()); // 댓글의 게시글 User
+
+        replyRepository.delete(snsReply);
+
+        replyRepository.flush();
+
+        List<SnsBoard> snsBoards = snsBoardRepository.findAllByUserNick(user.getUserNick());
+
+        List<SnsBoardResponseDTO> snsResponseList = snsBoards.stream()
+                .map(SnsBoardResponseDTO::new)
+                .collect(Collectors.toList());
+
+        return new SnsBoardDetailListResponseDTO(snsNo, user.getUserProfileImg(), snsResponseList);
+    }
+
+    // SNS 게시글 좋아요
+    @Override
+    public SnsBoardDetailListResponseDTO snsLike(final TokenUserInfo userInfo, final long snsNo) {
+        User user = userRepository.findById(userInfo.getUserId())
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 User 정보입니다."));
+
+        SnsBoard snsBoard = snsBoardRepository.findById(snsNo)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 SNS 게시글 번호입니다."));
+
+        if (!likeRepository.existsBySnsBoardSnsNoAndUserUserNick(snsNo, userInfo.getUserNick())) {
+            // 좋아요 추가
+            SnsLike like = likeRepository.save(SnsLike.builder().snsBoard(snsBoard).user(user).build());
+            snsBoard.getLikes().add(like); // 좋아요 관련 리스트에 추가
+        } else {
+            // 좋아요 취소
+            likeRepository.delete(likeRepository.findBySnsBoardSnsNoAndUserUserNick(snsNo, userInfo.getUserNick()));
+            snsBoard.getLikes().removeIf(like -> like.getUser().getUserNick().equals(userInfo.getUserNick())); // 좋아요 관련 리스트에서 제거
+        }
+
+        List<SnsBoard> snsBoards = snsBoardRepository.findAllByUserNick(userInfo.getUserNick());
+
+        List<SnsBoardResponseDTO> snsResponseList = snsBoards.stream()
+                .map(SnsBoardResponseDTO::new)
+                .collect(Collectors.toList());
+
+        return new SnsBoardDetailListResponseDTO(snsNo, user.getUserProfileImg(), snsResponseList);
+    }
+
 }

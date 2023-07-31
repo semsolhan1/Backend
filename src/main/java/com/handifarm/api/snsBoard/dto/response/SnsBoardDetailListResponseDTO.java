@@ -11,6 +11,7 @@ import java.util.List;
 public class SnsBoardDetailListResponseDTO {
 
     private long snsNo;
+    private String profileImg;
     private List<SnsBoardResponseDTO> snsList;
 
 }
