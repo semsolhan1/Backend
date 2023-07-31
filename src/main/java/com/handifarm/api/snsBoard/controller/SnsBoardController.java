@@ -15,6 +15,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -55,9 +58,8 @@ public class SnsBoardController {
 //    @Async
     public ResponseEntity<?> uploadSns(
             @AuthenticationPrincipal TokenUserInfo userInfo,
-//            @Validated @RequestPart("snsContent") SnsBoardCreateRequestDTO dto,
-//            @RequestPart(value = "snsImgs")List<MultipartFile> snsImgs,
-            @Validated @RequestBody SnsBoardCreateRequestDTO dto,
+            @Validated @RequestPart("snsContent") SnsBoardCreateRequestDTO dto,
+            @RequestPart(value = "snsImgs") List<MultipartFile> snsImgs,
             BindingResult result
             ) {
         log.info("SNS 게시글 등록 요청! - DTO : {}", dto);
@@ -68,7 +70,7 @@ public class SnsBoardController {
         }
 
         try {
-            SnsBoardResponseDTO snsBoardResponseDTO = snsBoardService.uploadSns(userInfo, dto);
+            SnsBoardResponseDTO snsBoardResponseDTO = snsBoardService.uploadSns(userInfo, dto, snsImgs);
             return ResponseEntity.ok().body(snsBoardResponseDTO);
         } catch (Exception e) {
             log.error("SNS 게시글 등록 중 오류 발생", e);
@@ -113,6 +115,66 @@ public class SnsBoardController {
         } catch (Exception e) {
             log.error("SNS 게시글 삭제 중 오류 발생", e);
             return ResponseEntity.badRequest().body("SNS 게시글 삭제 중 오류 발생 : " + e.getMessage());
+        }
+    }
+
+    // SNS 게시글 댓글 등록
+    @PostMapping("/{snsNo}/reply")
+    public ResponseEntity<?> snsReply(@AuthenticationPrincipal TokenUserInfo userInfo,
+                                      @PathVariable long snsNo, String reply) {
+        log.info("{}번 SNS 게시글 댓글 등록 요청! - Token User Info : {}", snsNo, userInfo);
+
+        try {
+            SnsBoardDetailListResponseDTO responseDTO = snsBoardService.registReply(userInfo, snsNo, reply);
+            return ResponseEntity.ok().body(responseDTO);
+        } catch (Exception e) {
+            log.error("SNS 게시글 댓글 등록 중 오류 발생", e);
+            return ResponseEntity.badRequest().body("SNS 게시글 댓글 등록 중 오류 발생 : " + e.getMessage());
+        }
+    }
+
+    // SNS 게시글 댓글 수정
+    @PatchMapping("/{snsNo}/reply/{replyNo}")
+    public ResponseEntity<?> modifyReply(@AuthenticationPrincipal TokenUserInfo userInfo,
+                                         @PathVariable long snsNo, @PathVariable long replyNo, String reply) {
+        log.info("{}번 SNS 게시글 {}번 댓글 수정 요청! - Token User Info : {}", snsNo, replyNo, userInfo);
+
+        try {
+            SnsBoardDetailListResponseDTO responseDTO = snsBoardService.modifyReply(userInfo, snsNo, replyNo, reply);
+            return ResponseEntity.ok().body(responseDTO);
+        } catch (Exception e) {
+            log.error("SNS 게시글 댓글 수정 중 오류 발생", e);
+            return ResponseEntity.badRequest().body("SNS 게시글 댓글 수정 중 오류 발생 : " + e.getMessage());
+        }
+    }
+
+    // SNS 게시글 댓글 삭제
+    @DeleteMapping("/{snsNo}/reply/{replyNo}")
+    public ResponseEntity<?> deleteReply(@AuthenticationPrincipal TokenUserInfo userInfo,
+                                         @PathVariable long snsNo, @PathVariable long replyNo) {
+        log.info("{}번 SNS 게시글 {}번 댓글 삭제 요청! - Token User Info : {}", snsNo, replyNo, userInfo);
+
+        try {
+            SnsBoardDetailListResponseDTO responseDTO = snsBoardService.deleteReply(userInfo, snsNo, replyNo);
+            return ResponseEntity.ok().body(responseDTO);
+        } catch (Exception e) {
+            log.error("SNS 게시글 댓글 삭제 중 오류 발생", e);
+            return ResponseEntity.badRequest().body("SNS 게시글 댓글 삭제 중 오류 발생 : " + e.getMessage());
+        }
+    }
+
+    // SNS 게시글 좋아요
+    @PatchMapping("/{snsNo}/like")
+    public ResponseEntity<?> snsLike(@AuthenticationPrincipal TokenUserInfo userInfo,
+                                     @PathVariable long snsNo) {
+        log.info("{}번 SNS 게시글 좋아요 요청! - Token User Info : {}", snsNo, userInfo);
+
+        try {
+            SnsBoardDetailListResponseDTO responseDTO = snsBoardService.snsLike(userInfo, snsNo);
+            return ResponseEntity.ok().body(responseDTO);
+        } catch (Exception e) {
+            log.error("SNS 게시글 좋아요 처리 중 오류 발생", e);
+            return ResponseEntity.badRequest().body("SNS 게시글 좋아요 처리 중 오류 발생 : " + e.getMessage());
         }
     }
 

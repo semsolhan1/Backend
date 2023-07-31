@@ -18,7 +18,7 @@ public class SnsReplyResponseDTO {
     private LocalDateTime regDate;
 
     public SnsReplyResponseDTO(SnsReply snsReply) {
-        this.writer = snsReply.getUser().getUserNick();
+        this.writer = snsReply.getWriter();
         this.reply = snsReply.getReply();
         this.regDate = snsReply.getReplyTime();
     }
