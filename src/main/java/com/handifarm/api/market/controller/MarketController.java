@@ -1,5 +1,6 @@
 package com.handifarm.api.market.controller;
 
+import com.handifarm.api.market.dto.paymenthistory.PaymentHistoryDTO;
 import com.handifarm.api.market.dto.request.MarketItemCreateRequestDTO;
 import com.handifarm.api.market.dto.request.MarketItemModifyRequestDTO;
 import com.handifarm.api.market.dto.response.MarketItemListResponseDTO;
@@ -116,6 +117,16 @@ public class MarketController {
         } catch (Exception e) {
             log.error("판매 게시글 판매 완료 처리 중 오류 발생", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("판매 게시글 판매 완료 처리 중 오류 발생: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/savePaymentData")
+    public ResponseEntity<?> savePaymentData(@RequestBody PaymentHistoryDTO paymentDataDto) {
+        try {
+            marketService.savePaymentData(paymentDataDto);
+            return ResponseEntity.ok("Payment data saved successfully!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error while saving payment data!");
         }
     }
 

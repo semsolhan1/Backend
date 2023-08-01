@@ -1,13 +1,16 @@
 package com.handifarm.api.market.service;
 
+import com.handifarm.api.market.dto.paymenthistory.PaymentHistoryDTO;
 import com.handifarm.api.market.dto.request.MarketItemCreateRequestDTO;
 import com.handifarm.api.market.dto.request.MarketItemModifyRequestDTO;
 import com.handifarm.api.market.dto.response.MarketItemListResponseDTO;
 import com.handifarm.api.market.dto.response.MarketItemResponseDTO;
 import com.handifarm.api.market.entity.ItemImg;
 import com.handifarm.api.market.entity.MarketItem;
+import com.handifarm.api.market.entity.PaymentHistory;
 import com.handifarm.api.market.repository.ItemImgRepository;
 import com.handifarm.api.market.repository.MarketItemRepository;
+import com.handifarm.api.market.repository.PaymentHistoryRepository;
 import com.handifarm.api.util.page.PageDTO;
 import com.handifarm.api.util.page.PageResponseDTO;
 import com.handifarm.aws.S3Service;
@@ -36,6 +39,7 @@ public class MarketService implements IMarketService {
 
     private final MarketItemRepository marketItemRepository;
     private final ItemImgRepository itemImgRepository;
+    private final PaymentHistoryRepository paymentHistoryRepository;
     private final S3Service s3Service;
     private final String serviceName = "MARKET";
 
@@ -214,5 +218,18 @@ public class MarketService implements IMarketService {
 
         // MarketItemResponseDTO 객체를 생성하여 반환
         return new MarketItemResponseDTO(marketItem);
+    }
+
+    public void savePaymentData(PaymentHistoryDTO paymentDataDto) {
+
+        // PaymentHistoryDTO에서 데이터를 꺼내서 바로 저장
+        PaymentHistory paymentHistory = new PaymentHistory();
+        paymentHistory.setOrderId(paymentDataDto.getOrderId());
+        paymentHistory.setPrice(paymentDataDto.getAmount());
+        paymentHistory.setBuyer(paymentDataDto.getBuyer());
+        paymentHistory.setSeller(paymentDataDto.getSeller());
+        paymentHistory.setItemName(paymentDataDto.getOrderName());
+
+        paymentHistoryRepository.save(paymentHistory);
     }
 }
