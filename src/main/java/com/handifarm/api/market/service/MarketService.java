@@ -225,7 +225,7 @@ public class MarketService implements IMarketService {
         // PaymentHistoryDTO에서 데이터를 꺼내서 바로 저장
         PaymentHistory paymentHistory = new PaymentHistory();
         paymentHistory.setOrderId(paymentDataDto.getOrderId());
-        paymentHistory.setPrice(paymentDataDto.getAmount());
+        paymentHistory.setPrice(paymentDataDto.getPrice());
         paymentHistory.setBuyer(paymentDataDto.getBuyer());
         paymentHistory.setSeller(paymentDataDto.getSeller());
         paymentHistory.setItemName(paymentDataDto.getOrderName());
