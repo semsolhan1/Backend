@@ -11,8 +11,9 @@ import lombok.*;
 @Builder
 public class PaymentHistoryDTO {
 
+    private long itemNo;
     private String orderId;
-    private int amount;
+    private long price;
     private String buyer;
     private String seller;
     private String orderName;

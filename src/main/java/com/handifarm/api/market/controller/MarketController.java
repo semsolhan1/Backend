@@ -123,6 +123,7 @@ public class MarketController {
     @PostMapping("/savePaymentData")
     public ResponseEntity<?> savePaymentData(@RequestBody PaymentHistoryDTO paymentDataDto) {
         try {
+            marketService.doneItem(paymentDataDto.getItemNo());
             marketService.savePaymentData(paymentDataDto);
             return ResponseEntity.ok("Payment data saved successfully!");
         } catch (Exception e) {
