@@ -33,7 +33,7 @@ public class PaymentHistory {
     private String itemName;
 
     @Column(nullable = false)
-    private int price;
+    private long price;
 
     @CreationTimestamp
     private LocalDateTime paymentDate;
