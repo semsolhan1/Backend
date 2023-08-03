@@ -12,6 +12,11 @@ import com.handifarm.jwt.TokenProvider;
 import com.handifarm.jwt.TokenUserInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.nurigo.sdk.NurigoApp;
+import net.nurigo.sdk.message.model.Message;
+import net.nurigo.sdk.message.request.SingleMessageSendingRequest;
+import net.nurigo.sdk.message.response.SingleMessageSentResponse;
+import net.nurigo.sdk.message.service.DefaultMessageService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -57,18 +62,18 @@ public class UserService implements IUserService {
         // 인증번호 생성
         String authenticationNumber = makeAuthenticationNumber();
 
-//        // 메시지 전송 시작.
-//        Message message = new Message();
-//        final DefaultMessageService messageService
-//                = NurigoApp.INSTANCE.initialize(apiKey, secretKey, "https://api.coolsms.co.kr");
-//
-//        // 전송할 메시지 정보 설정
-//        message.setFrom(sendNumber); // 발신번호
-//        message.setTo(phoneNum); // 수신번호
-//        message.setText("HandiFarm 휴대폰 인증번호는 [ " + authenticationNumber + " ] 입니다. 인증번호 입력칸에 입력해주세요.");
-//
-//        SingleMessageSentResponse sentResponse = messageService.sendOne(new SingleMessageSendingRequest(message));
-//        log.info("전송한 메세지 정보 : {}", sentResponse);
+        // 메시지 전송 시작.
+        Message message = new Message();
+        final DefaultMessageService messageService
+                = NurigoApp.INSTANCE.initialize(apiKey, secretKey, "https://api.coolsms.co.kr");
+
+        // 전송할 메시지 정보 설정
+        message.setFrom(sendNumber); // 발신번호
+        message.setTo(phoneNum); // 수신번호
+        message.setText("HandiFarm 휴대폰 인증번호는 [ " + authenticationNumber + " ] 입니다. 인증번호 입력칸에 입력해주세요.");
+
+        SingleMessageSentResponse sentResponse = messageService.sendOne(new SingleMessageSendingRequest(message));
+        log.info("전송한 메세지 정보 : {}", sentResponse);
         // 메시지 전송 끝.
 
         return authenticationNumber;
