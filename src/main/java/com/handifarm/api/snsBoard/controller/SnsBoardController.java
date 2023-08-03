@@ -15,9 +15,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RestController
 @Slf4j
@@ -38,7 +35,7 @@ public class SnsBoardController {
 
     // SNS 유저 게시글 목록
     @GetMapping("/{snsNo}")
-    public ResponseEntity<?> getSns(@PathVariable(required = false) Long snsNo, String userNick) {
+    public ResponseEntity<?> getSns(@PathVariable Long snsNo, @RequestParam String userNick) {
         log.info("{}번 SNS 게시글 조회 요청! - 해당 게시글의 작성자 : {}", snsNo, userNick);
 
         if (snsNo == null) snsNo = 0L;
