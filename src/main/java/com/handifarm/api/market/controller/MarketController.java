@@ -76,7 +76,7 @@ public class MarketController {
             @RequestPart(value = "itemImgs", required = false) List<MultipartFile> itemImgs,
             BindingResult result
     ) {
-        log.info("{}번 판매 게시글 수정 요청! - DTO : {}", itemNo, requestDTO);
+        log.info("{}번 판매 게시글 수정 요청! - DTO : {}, Files : {}", itemNo, requestDTO, itemImgs);
 
         if (result.hasErrors()) {
             log.warn(result.toString());
