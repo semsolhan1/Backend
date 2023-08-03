@@ -54,14 +54,36 @@ public class SnsBoardController {
     }
 
     // SNS 게시글 등록
-    @PostMapping
+//    @PostMapping
 //    @Async
+//    public ResponseEntity<?> uploadSns(
+//            @AuthenticationPrincipal TokenUserInfo userInfo,
+//            @Validated @RequestPart("snsContent") SnsBoardCreateRequestDTO dto,
+//            @RequestPart(value = "snsImgs") List<MultipartFile> snsImgs,
+//            BindingResult result
+//            ) {
+//        log.info("SNS 게시글 등록 요청! - DTO : {}", dto);
+//
+//        if (result.hasErrors()) {
+//            log.warn(result.toString());
+//            return ResponseEntity.badRequest().body(result.getFieldError());
+//        }
+//
+//        try {
+//            SnsBoardResponseDTO snsBoardResponseDTO = snsBoardService.uploadSns(userInfo, dto, snsImgs);
+//            return ResponseEntity.ok().body(snsBoardResponseDTO);
+//        } catch (Exception e) {
+//            log.error("SNS 게시글 등록 중 오류 발생", e);
+//            return ResponseEntity.badRequest().body("SNS 게시글 등록 중 오류 발생 : " + e.getMessage());
+//        }
+//    }
+
+    @PostMapping
     public ResponseEntity<?> uploadSns(
             @AuthenticationPrincipal TokenUserInfo userInfo,
-            @Validated @RequestPart("snsContent") SnsBoardCreateRequestDTO dto,
-            @RequestPart(value = "snsImgs") List<MultipartFile> snsImgs,
+            @Validated SnsBoardCreateRequestDTO dto,
             BindingResult result
-            ) {
+    ) {
         log.info("SNS 게시글 등록 요청! - DTO : {}", dto);
 
         if (result.hasErrors()) {
@@ -70,7 +92,7 @@ public class SnsBoardController {
         }
 
         try {
-            SnsBoardResponseDTO snsBoardResponseDTO = snsBoardService.uploadSns(userInfo, dto, snsImgs);
+            SnsBoardResponseDTO snsBoardResponseDTO = snsBoardService.uploadSns(userInfo, dto, dto.getSnsImgs());
             return ResponseEntity.ok().body(snsBoardResponseDTO);
         } catch (Exception e) {
             log.error("SNS 게시글 등록 중 오류 발생", e);

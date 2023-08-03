@@ -12,11 +12,6 @@ import com.handifarm.jwt.TokenProvider;
 import com.handifarm.jwt.TokenUserInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.nurigo.sdk.NurigoApp;
-import net.nurigo.sdk.message.model.Message;
-import net.nurigo.sdk.message.request.SingleMessageSendingRequest;
-import net.nurigo.sdk.message.response.SingleMessageSentResponse;
-import net.nurigo.sdk.message.service.DefaultMessageService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -143,9 +138,9 @@ public class UserService implements IUserService {
 
     // 유저 정보 수정
     @Override
-    public UserInfoResponseDTO userInfoModify(final TokenUserInfo userInfo,
-                                              final UserInfoModifyRequestDTO requestDTO,
-                                              final MultipartFile profileImg) throws Exception {
+    public UserLoginResponseDTO userInfoModify(final TokenUserInfo userInfo,
+                                               final UserInfoModifyRequestDTO requestDTO,
+                                               final MultipartFile profileImg) throws Exception {
 
         User user = userRepository.findById(userInfo.getUserId()).orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
 
@@ -177,7 +172,9 @@ public class UserService implements IUserService {
 
         log.info("회원 정보 수정 완료. DB에 입력된 데이터 : {}", saved);
 
-        return new UserInfoResponseDTO(saved);
+        String token = tokenProvider.createToken(saved);
+
+        return new UserLoginResponseDTO(user, token);
     }
 
     // 프로필 이미지 등록

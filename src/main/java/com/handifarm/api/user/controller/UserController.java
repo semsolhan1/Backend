@@ -117,7 +117,7 @@ public class UserController {
         }
 
         try {
-            UserInfoResponseDTO userInfoResponseDTO = service.userInfoModify(userInfo, requestDTO, profileImg);
+            UserLoginResponseDTO userInfoResponseDTO = service.userInfoModify(userInfo, requestDTO, profileImg);
             return ResponseEntity.ok().body(userInfoResponseDTO);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
