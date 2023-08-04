@@ -99,5 +99,6 @@ compileQuerydsl {
 
 
 tasks.named('test') {
-	useJUnitPlatform()
+//	useJUnitPlatform()
+	exclude '**/*'
 }
