@@ -6,6 +6,7 @@ build/
 !**/src/test/**/build/
 
 ### Key 관리 yml ###
+*.yml
 keys.yml
 
 ### STS ###
